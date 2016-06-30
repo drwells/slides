@@ -1,0 +1,135 @@
+\documentclass[8pt]{beamer}
+
+\graphicspath{{fig/}}
+
+\usetheme{Copenhagen}
+\usecolortheme{beaver}
+\usepackage[small,center]{caption}
+\usepackage{times}
+\usepackage[absolute,overlay]{textpos} 
+\usefonttheme{structurebold}
+\usepackage[english]{babel}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb}
+\usepackage{amsxtra}
+\usepackage[latin1]{inputenc}
+\usepackage{algorithm2e} 
+
+
+%\usepackage{multimedia}
+\usepackage{caption}
+  \usepackage{movie15}
+%\usepackage{pictex}
+% \usepackage[pdftex]{color}                  %for colors
+%\usepackage[pdftex]{graphicx}               %for importing graphics
+%\usepackage{times}                          %for nice fonts
+%\usepackage[pdftex]{hyperref}               %for hyperlinking and other
+%\usepackage{rotating}
+\definecolor{RPIred}{rgb}{ 0.87,0.12, 0.20}
+\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
+\definecolor{lightgray}{rgb}{0.83, 0.83, 0.83}
+\setbeamercolor{block title}{bg=lightgray,fg=RPIred}%bg=background, fg= foreground
+\setbeamercolor{block body}{bg=white,fg=black}%bg=background, fg= foreground
+\setbeamercovered{dynamic}
+\setbeamercolor*{item}{fg=RPIred}
+%-----------------------------------------------------------------------------------------------
+% Begin document
+%--------------------------
+% personal Macros
+%
+\include{drlmacros}
+%--------------------------
+
+%--------------------------
+% Title-Author-Date
+%
+\captionsetup[subfigure]{labelformat=empty}
+\captionsetup[figure]{labelformat=empty}
+\setbeamertemplate{navigation symbols}{}
+
+%\setbeamertemplate{headline}{\vspace{1.5cm}}
+
+%\AtBeginSection[]{\frame{\frametitle{Outline}\tableofcontents[current]}}
+
+% 
+\newcommand{\bc}[1]{\mbox{\bfss#1}}   % bold name
+\newcommand{\cc}[1]{\mbox{$//$  #1}}  % comment
+%
+\newcommand{\ia}{\qquad\qquad}        % indent level 1
+\newcommand{\ib}{\ia\quad}     % indent level 2
+\newcommand{\ic}{\ib\quad}     % indent level 3
+\newcommand{\id}{\ic\quad}     % indent level 4
+\newcommand{\ie}{\id\quad}     % indent level 5
+
+\newcommand{\FUNC}[1]{{\color{blue}#1}}
+\newcommand{\RETURN}{{\color{blue}Return}}
+\newcommand{\IF}{{\color{blue}if}}
+\newcommand{\ELSE}{{\color{blue}else}}
+\newcommand{\ELSEIF}{{\color{blue}else if}}
+\newcommand{\FOR}{{\color{blue}for}}
+% \newcommand{\COM}[1]{{\color{red}\em #1}}
+\newcommand{\COM}[1]{{\color{purple}\em #1}}
+
+
+% defs
+
+
+
+\usepackage{tikz}
+
+\begin{document}
+
+%\setbeamertemplate{background}
+%{\includegraphics[width=\paperwidth,height=\paperheight]{front.jpg}}
+ \frame{
+\title{\Large  A stable partitioned FSI algorithm for incompressible flow and deforming beams}
+
+\author{{\Large Longfei Li \\\vspace{0.1in} Rensselaer Polytechnic Institute}\\
+\vspace{0.2in} {In collaboration with:\\W. D. Henshaw, J. W. Banks and D. W. Schwendeman}} 
+
+
+\date{April 2, 2016\\Applied Mathematics Days \\ 
+Rensselaer Polytechnic Institute, Troy, NY}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1.5in]{/Users/longfei/Dropbox/LatexTemplates/logos/RPI_letterhead.pdf}
+ \end{figure}%        
+
+%\begin{textblock*}{\textwidth}(.5in,3in) 
+%\begin{columns}
+%\column{0.5\textwidth}
+%\column{0.5\textwidth}
+%\end{columns}
+%\end{textblock*} 
+\vspace{-0.2in}
+\titlepage
+}
+%\section*{Outline}
+
+\frame
+{
+\frametitle{Outline}
+\begin{itemize}
+\item[$\blacksquare$]  Introduction\\
+\item[$\blacksquare$]  Governing Equations\\ 
+\item[$\blacksquare$]  Added Mass Partition (AMP) Scheme\\ 
+\item[$\blacksquare$]  Finite-Element Beam\\ 
+\item[$\blacksquare$]  Stability Analysis\\
+\item[$\blacksquare$]  Numerical Results\\
+\item[$\blacksquare$]  Summary\\
+\end{itemize}
+}
+
+
+
+\frame{
+\begin{center}
+\textcolor{RPIred}{\Huge Thank You!}
+\end{center}
+}
+\end{document}
+
+
+
+
