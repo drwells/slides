@@ -15,6 +15,8 @@
 \newcommand{\leftd}[1]{{\color{red} \bar{#1}}}
 \newcommand{\interface}[2]{{\color{blue}{#1}_I(#2)}}
 \newcommand{\leftdd}[2]{{\color{red} \bar{#1}(\bar{#2})}}
+\newcommand{\leftFourier}[1]{{\color{red} \hat{#1}}}
+\newcommand{\leftFourierTwo}[2]{{\color{red} \hat{#1}(\hat{#2})}}
 \newcommand{\half}{\dfrac{1}{2}}
 \newcommand{\divergence}{\mathrm{div}}
 
@@ -112,7 +114,9 @@ Warwick University}
     thin shell, i.e., a beam:
     \begin{align}
         \leftd{u}_t              &= \leftd{v}                                 \\
-        \leftd{\rho} \leftd{v}_t &= \leftdd{L}{u} + \leftd{b} + \leftd{f}
+        \leftd{\rho} \leftd{v}_t &= \leftdd{L}{u} + \leftd{b} + \leftd{f}     \\
+        \leftdd{L}{u}            &= \leftd{s} \leftd{u}_{xx}
+        - \leftd{a} \leftd{u}_{xxxx}
     \end{align}
 
     \pause
@@ -122,9 +126,7 @@ Warwick University}
         \leftd{b} &= -\sigma n.
     \end{align}
     \pause
-
-    Applying the physical boundary condition as the numerical one is usually
-    called the \emph{traditional scheme}.
+    Physically motivated BCs: no jump in velocity, no jump in stress.
 \end{frame}
 
 \begin{frame}
@@ -156,9 +158,7 @@ Warwick University}
 
 \begin{frame}
     \frametitle{Previous Work}
-    Most of the work has been done for finite differences with overlapping
-    grids.
-
+    Most of the work in our group has been done in a finite difference setting.
     \begin{figure}
         \centering
 
@@ -172,8 +172,8 @@ Warwick University}
 
 \begin{frame}
     \frametitle{Traditional Coupling}
-    \emph{Traditional Coupling} refers to using the physical boundary conditions
-    for the numerical solver.
+    \emph{Traditional Coupling} refers to taking the velocity from the beam and
+    stress from the fluid.
 
     With some simplifying assumptions on the fluid (periodic in the non-shell
     direction, zero viscosity) we can explicitly compute the mode-dependent
@@ -201,15 +201,18 @@ Warwick University}
     \frametitle{AMP Coupling}
     Some beams are sufficiently light that (for the simplified model) that there
     is no stable time step choice with the traditional scheme.
-    \pause
+
     \begin{align}
         \leftd{\rho} \leftd{h} \leftd{v_t}
-        &= \leftdd{\mathcal{L}}{u} + \leftd{f} - \sigma n                     \\
+        &= \leftdd{\mathcal{L}}{u} + \leftd{f} - \sigma n
+        \quad \text{ (beam equation)}                                         \\
         \leftd{\rho} \leftd{h} v_t
-        &= \leftdd{\mathcal{L}}{u} + \leftd{f} - \sigma n                     \\
+        &= \leftdd{\mathcal{L}}{u} + \leftd{f} - \sigma n
+        \quad \text{ (equal acceleration)}                                    \\
         \dfrac{\leftd{\rho} \leftd{h}}{\rho} \divergence(\sigma)
         + \dfrac{\leftd{\rho} \leftd{h}}{\rho} f
         &= \leftdd{\mathcal{L}}{u} + \leftd{f} - \sigma n
+        \quad \text{ (Stokes equations)}
     \end{align}
     or, more simply
     \begin{equation}
@@ -245,7 +248,8 @@ Warwick University}
         (q, \divergence(v)) &= 0
     \end{align}
 
-    so replace the normal part of the traction with the PDE:
+    We replace the traction with second derivatives. This will make the
+    energy estimate harder and probably won't work for classic FEM:
     \begin{equation}
         (\varphi, \sigma n)_{\partial \Omega} = \left(\varphi,
         - \dfrac{\leftd{\rho} \leftd{h}}{\rho} \divergence(\sigma)
@@ -263,7 +267,7 @@ Warwick University}
               Dirichlet conditions tangentially)
         \item Assume that the beam solution is already known, i.e., enforce
               \begin{equation}
-                  \sigma n + \divergence(\sigma) = g
+                  \sigma n n^T + \divergence(\sigma) n^T = g
               \end{equation}
               on the boundary.
     \end{itemize}
@@ -292,7 +296,8 @@ Warwick University}
         \centering
         \includegraphics[width=3in]{v1-10.png}
 
-        \caption{Magnitude in the error after ten time steps.}
+        \caption{Magnitude in the error after ten time steps. As anticipated the
+        scheme doesn't work.}
     \end{figure}
 \end{frame}
 
@@ -364,8 +369,9 @@ Warwick University}
         -2 \nu (\varphi_{1,y}, \hat{v}_y)
         + \nu (\varphi_1, i k \hat{u}_y - k^2 \hat{v})
         + (\varphi_{1,y}, p)                                                  \\
-        &+ (\varphi_1, \hat{f}_1)
-        + \varphi_1(1) (2 \nu \hat{v}_y(1) - \hat{p}(1))                      \\
+        &\phantom{=} + (\varphi_1, \hat{f}_1)
+        + \varphi_1(1) (2 \nu \hat{v}_y(1) - \hat{p}(1))
+        \nonumber                                                             \\
         (q, i k \hat{u} + \hat{v}_y)
         &= 0.
     \end{align}
@@ -388,28 +394,82 @@ Warwick University}
             \(\hat{p}\) error & \(\hat{u}\) error &
             \(\hat{p}\) rate & \(\hat{u}\) rate                               \\
             \hline
-            0 & 10 & 9.75e-04 & 6.61e-03 & - & -                              \\
-            0 & 15 & 3.04e-04 & 1.61e-03 & 3.47 & 2.86                        \\
-            0 & 20 & 1.31e-04 & 6.30e-04 & 3.27 & 2.91                        \\
-            0 & 25 & 6.85e-05 & 3.10e-04 & 3.17 & 2.93                        \\
-            0 & 30 & 4.00e-05 & 1.73e-04 & 3.20 & 2.94                        \\
-            0 & 35 & 2.54e-05 & 1.06e-04 & 3.12 & 2.95                        \\
-            0 & 40 & 1.71e-05 & 7.13e-05 & 3.03 & 2.96                        \\
-            0 & 45 & 1.20e-05 & 4.96e-05 & 3.08 & 2.96                        \\
+            0  & 10 & 4.30e+00 & 2.46e-01 & -   & -                           \\
+            0  & 15 & 1.37e+00 & 8.09e-02 & 2.80 & 2.74                       \\
+            0  & 20 & 6.02e-01 & 3.58e-02 & 2.87 & 2.82                       \\
+            0  & 25 & 3.15e-01 & 1.89e-02 & 2.90 & 2.87                       \\
+            0  & 30 & 1.84e-01 & 1.11e-02 & 2.92 & 2.89                       \\
+            0  & 35 & 1.17e-01 & 7.11e-03 & 2.94 & 2.91                       \\
+            0  & 40 & 7.91e-02 & 4.81e-03 & 2.94 & 2.92                       \\
+            0  & 45 & 5.58e-02 & 3.40e-03 & 2.95 & 2.93                       \\
             \hline
-            1 & 10 & 6.00e-00 & 3.43e-01 & -    & -                           \\
-            1 & 15 & 1.89e-00 & 1.10e-01 & 2.78 & 2.84                        \\
-            1 & 20 & 8.20e-01 & 4.86e-02 & 2.85 & 2.90                        \\
-            1 & 25 & 4.26e-01 & 2.54e-02 & 2.89 & 2.92                        \\
-            1 & 30 & 2.49e-01 & 1.49e-02 & 2.91 & 2.94                        \\
-            1 & 35 & 1.58e-01 & 9.52e-03 & 2.93 & 2.95                        \\
-            1 & 40 & 1.06e-01 & 6.43e-03 & 2.93 & 2.95                        \\
-            1 & 45 & 7.51e-02 & 4.54e-03 & 2.94 & 2.96                        \\
+            10 & 10 & 2.45e+01 & 8.44e-01 & -    & -                          \\
+            10 & 15 & 5.46e+00 & 1.89e-01 & 3.71 & 3.68                       \\
+            10 & 20 & 2.06e+00 & 7.18e-02 & 3.37 & 3.36                       \\
+            10 & 25 & 1.00e+00 & 3.49e-02 & 3.23 & 3.22                       \\
+            10 & 30 & 5.64e-01 & 1.96e-02 & 3.16 & 3.15                       \\
+            10 & 35 & 3.49e-01 & 1.21e-02 & 3.11 & 3.11                       \\
+            10 & 40 & 2.31e-01 & 8.06e-03 & 3.08 & 3.08                       \\
+            10 & 45 & 1.61e-01 & 5.62e-03 & 3.06 & 3.06                       \\
             \hline
         \end{tabular}
 
         \caption{Rates of convergence for the first and second wavenumbers. The
         method is stable, but loses an order of convergence.}
+    \end{figure}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Equation for a ``\(0\) dimensional'' beam}
+    If we Fourier transform the beam equation we get an ODE:
+    \begin{align}
+        \leftFourier{u}_t              &= \leftFourier{v}                     \\
+        \leftd{\rho} \leftFourier{v}_t &= \leftFourierTwo{L}{u}
+        - \sigma n + \leftFourier{f} \leftFourier{L}                          \\
+        \leftFourier{L} &= -\leftd{s} k^2 - \leftd{a} k^4
+    \end{align}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Convergence for a somewhat light beam}
+    For \(\leftd{\rho} = 100\):
+    \begin{figure}
+        \centering
+        \begin{tabular}{| l | l | l | l | l | l | l | l |}
+            \hline
+            \(k\) & \texttt{n\_cells} &
+            \(\hat{p}\) error & \(\hat{v}\) error & \(\leftFourier{v}\) error &
+            \(\hat{p}\) rate & \(\hat{v}\) rate & \(\leftFourier{v}\) rate    \\
+            \hline
+            0  & 10 & 8.97e+05 & 2.91e+04 & 2.58e+03 & - & - & -              \\
+            0  & 15 & 7.93e+02 & 2.68e+01 & 4.65e+00 & 1.73e+01 & 1.72e+01 &
+            1.55e+01                                                          \\
+            0  & 20 & 2.76e+01 & 9.59e-01 & 2.62e-01 & 1.16e+01 & 1.15e+01 &
+            9.99e+00                                                          \\
+            0  & 25 & 1.51e+00 & 5.68e-02 & 3.29e-02 & 1.30e+01 & 1.25e+01 &
+            9.30e+00                                                          \\
+            0  & 30 & 7.32e-01 & 2.30e-02 & 2.47e-03 & 3.98e+00 & 5.36e+00 &
+            1.42e+01                                                          \\
+            0  & 35 & 8.06e-01 & 2.66e-02 & 2.87e-03 & -6.2e-01 & -1.0e+00 &
+            -9.8e-01                                                          \\
+            0  & 40 & 6.41e-01 & 2.14e-02 & 3.52e-03 & 1.70e+00 & 1.58e+00 &
+            -1.5e+00                                                          \\
+            0  & 45 & 4.88e-01 & 1.64e-02 & 3.12e-03 & 2.31e+00 & 2.25e+00 &
+            1.02e+00                                                          \\
+            0  & 50 & 3.72e-01 & 1.25e-02 & 2.58e-03 & 2.57e+00 & 2.53e+00 &
+            1.80e+00                                                          \\
+            0  & 55 & 2.87e-01 & 9.71e-03 & 2.10e-03 & 2.71e+00 & 2.68e+00 &
+            2.13e+00                                                          \\
+            0  & 60 & 2.25e-01 & 7.63e-03 & 1.71e-03 & 2.79e+00 & 2.76e+00 &
+            2.37e+00                                                          \\
+            0  & 65 & 1.79e-01 & 6.08e-03 & 1.39e-03 & 2.83e+00 & 2.81e+00 &
+            2.53e+00                                                          \\
+            0  & 70 & 1.45e-01 & 4.92e-03 & 1.15e-03 & 2.88e+00 & 2.85e+00 &
+            2.56e+00                                                          \\
+            \hline
+        \end{tabular}
+
+        \caption{Rates of convergence for the first wave number.}
     \end{figure}
 \end{frame}
 
