@@ -1,0 +1,12 @@
+*.tar.gz
+*~
+*/*~
+*.{aux,log,nav}
+*/*.aux
+*/*.log
+*/*.nav
+*/*.toc
+*/*.bbl
+*/*.blg
+*/*.out
+*/*.snm
