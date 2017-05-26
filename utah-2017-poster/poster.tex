@@ -189,7 +189,7 @@ fontscale=0.4
           \(\rho\), external force \(\vec{f}\)):
           \begin{align*}
               \rho \vec{v}_t &= \divergence(\sigma) + \vec{f}                 \\
-              \sigma &= -p I + 2 \nu \varepsilon(v)                           \\
+              \sigma &= -p I + 2 \nu \varepsilon(\vec{v})                     \\
               \varepsilon(\vec{v})_{ij} &= \dfrac{1}{2}
               \left(
               \dfrac{\partial v_i}{\partial x_j} +
@@ -230,11 +230,11 @@ structure and matching \emph{accelerations} for the fluid instead:
     \leftd{\rho} \leftd{h} \leftd{v}_{{\color{red}t}}
     &= \leftdd{\mathcal{L}}{u} + \leftd{f} - \sigma \vec{n}
     \quad \text{ (beam equation)}                                             \\
-    \leftd{\rho} \leftd{h} v_t
+    \leftd{\rho} \leftd{h} \vec{v}_t
     &= \leftdd{\mathcal{L}}{u} + \leftd{f} - \sigma \vec{n}
     \quad \text{ (equal acceleration)}                                        \\
     \dfrac{\leftd{\rho} \leftd{h}}{\rho} \divergence(\sigma)
-    + \dfrac{\leftd{\rho} \leftd{h}}{\rho} f
+    + \dfrac{\leftd{\rho} \leftd{h}}{\rho} \vec{f}
     &= \leftdd{\mathcal{L}}{u} + \leftd{f} - \sigma \vec{n}
     \quad \text{ (Stokes equations)}
 \end{align*}
@@ -254,15 +254,15 @@ structure and matching \emph{accelerations} for the fluid instead:
 {name=FEScheme,column=1,below=AddedMass,above=bottom}
 {
 \begin{itemize}
-    \item Apply the Fourier transform:
+    \item Apply the Fourier transform, with \(\vec{v} = (u, v)\):
           \begin{align*}
               \begin{pmatrix}
                   \hat{u} \\ \hat{v}
               \end{pmatrix}_t
               &=
-              \begin{pmatrix}
-                  i k & \dfrac{\partial}{\partial y}
-              \end{pmatrix}
+              \left(
+                  i k, \dfrac{\partial}{\partial y}
+              \right)
               \cdot
               \left[
               \begin{pmatrix}
