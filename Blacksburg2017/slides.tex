@@ -111,7 +111,7 @@
         \end{equation}
         \pause
         \begin{equation}
-            \varepsilon \dfrac{U_{i + 1} - 2 U_i + U_{i + 1}}{h^2} +
+            \varepsilon \dfrac{U_{i + 1} - 2 U_i + U_{i - 1}}{h^2} +
             \dfrac{U_{i + 1} - U_{i - 1}}{2 h} = 1
         \end{equation}
         known to be an unstable discretization for small \(\varepsilon\)
@@ -125,6 +125,7 @@
             \dfrac{{\color{red} U_{i + 1}}}{2 h} +
             \dfrac{{\color{red} U_{i + 1}}}{2 h} -
             \dfrac{{\color{red} 2 U_i}}{2 h} +
+            \dfrac{\color{red} U_{i - 1}}{2 h} +
             \dfrac{1}{2 h}
             \left(
             {{\color{red} U_{i - 1}} - {\color{red} U_{i - 1}}}
@@ -136,8 +137,7 @@
         \end{align}
         \pause
         Using a forward difference (\emph{upwinding}) results in an order \(1\)
-        method with a much larger diffusion length scale (\(O(\sqrt{h}) \gg
-        O(\sqrt{\varepsilon})\)).
+        method with a much larger diffusion coefficient
     \end{frame}
 
     \begin{frame}
@@ -148,10 +148,10 @@
             \varepsilon ((\varphi + \delta \varphi_x)_x, u_x)
             + (\varphi + \delta \varphi_x, u_x)
             &= (\varphi + \delta \varphi_x, f)                                \\
-            + (\varepsilon + \delta) (\varphi_x, u_x)
-            + \delta (\varphi_{xx}, u_x)
+            (\varepsilon + \delta) (\varphi_x, u_x)
+            + \varepsilon \delta (\varphi_{xx}, u_x)
             + (\varphi, u_x)
-            &= (\varphi + \delta \varphi_x, f)                                \\
+            &= (\varphi + \delta \varphi_x, f)
         \end{align}
         so the new viscous length scale is \(O(\sqrt{\delta})\): if \(\delta =
         O(h)\) then this can be resolved.
@@ -180,7 +180,7 @@
     \begin{frame}
         \frametitle{The SUPG-ROM}
         \begin{itemize}
-            \item SUPG helps us avoid instabilities arrising from unresolved
+            \item SUPG helps us avoid instabilities arising from unresolved
                   modes
                   \pause
             \item Unresolved modes \(\rightarrow\) aliasing onto the resolved
