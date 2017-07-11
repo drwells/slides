@@ -1,0 +1,21 @@
+* things to discuss
+  1. superconvergence overview: Laplace in 1D, CDR in 1D
+  2. motivation: no-postprocessing (stability), intrinsic value (fluxes),
+     multiphysics (compatibility BCs)
+  3. goals: order n approximations to the function values -> order n first and
+     second derivatives (like finite differences)
+  4. a little on h and p finite elements (part of the background information:
+     local p refinement != p-method): static p-refinement, global h-refinement
+  5. other derivative methods (with citations)
+  6. results for the laplace equation in 1D (zero error at knot -> arbitrary
+     local order)
+  7. Green's function result in 1D (for knot error near the boundary): O(h)
+     derivatives on most of the domain -> we gain an order
+  8. CDR boundary convergence result in 1D
+  9. numerical results in 1D
+  10. Extension to 2D: discuss just Laplace with Fourier transform in x for now
+  11. normal p-enrichment algorithm: interpolation
+  12. numerical example of a periodic domain (with breakdown if we include
+      nonnormal p-refinement)
+  13. numerical example of the circle: looks periodic near the boundary in the
+      angular direction, exact description in polar coordinates

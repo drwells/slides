@@ -1,0 +1,99 @@
+\documentclass[8pt]{beamer}
+
+\usetheme{Copenhagen}
+\usecolortheme{beaver}
+\usepackage[small,center]{caption}
+\usepackage{times}
+\usefonttheme{structurebold}
+\usepackage[english]{babel}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb}
+\usepackage{amsxtra}
+
+\usepackage{caption}
+
+\newcommand{\leftd}[1]{{\color{red} \bar{#1}}}
+\newcommand{\interface}[2]{{\color{blue}{#1}_I(#2)}}
+\newcommand{\leftdd}[2]{{\color{red} \bar{#1}(\bar{#2})}}
+\newcommand{\leftFourier}[1]{{\color{red} \hat{#1}}}
+\newcommand{\leftFourierTwo}[2]{{\color{red} \hat{#1}(\hat{#2})}}
+\newcommand{\half}{\dfrac{1}{2}}
+\newcommand{\divergence}{\mathrm{div}}
+
+\newcommand*{\vcenterimage}[1]{\vcenter{\hbox{\includegraphics[width=2in]{#1}}}}
+\newcommand*{\vcenterarrow}{\vcenter{\hbox{$\Longrightarrow$}}}
+
+
+\definecolor{RPIred}{rgb}{ 0.87,0.12, 0.20}
+\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
+\definecolor{lightgray}{rgb}{0.83, 0.83, 0.83}
+\setbeamercolor{block title}{bg=lightgray,fg=RPIred}
+\setbeamercolor{block body}{bg=white,fg=black}
+\setbeamercovered{dynamic}
+\setbeamercolor*{item}{fg=RPIred}
+
+\captionsetup[subfigure]{labelformat=empty}
+\captionsetup[figure]{labelformat=empty}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\begin{document}
+
+\frame{
+\title{\Large Improving Boundary Derivative Accuracy with \(p\)-Refinement}
+
+\author{{\Large David Wells \\\vspace{0.1in} Rensselaer Polytechnic Institute}\\
+\vspace{0.2in} {In collaboration with:\\{}J. W. Banks, F. Li}}
+
+\date{July 13, 2017\\{} SIAM Annual Meeting}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1.5in]{RPI_letterhead.pdf}
+ \end{figure}%
+
+\vspace{-0.2in}
+\titlepage
+}
+
+\begin{frame}
+    \frametitle{Outline}
+    \begin{itemize}
+    \item[$\blacksquare$] Goals and Definitions                               \\
+    \item[$\blacksquare$] Governing Equations                                 \\
+    \item[$\blacksquare$] A Little on Superconvergence                        \\
+    \item[$\blacksquare$] \(p\)-refinement results in 1D                      \\
+    \item[$\blacksquare$] Extensions to 2D                                    \\
+    \item[$\blacksquare$] Summary                                             \\
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Partitioned Methods}
+    \emph{Partitioned Methods} couple a fluid and structure solver along a
+    specified interface. They are an alternative option to \emph{monolithic
+    solvers}, which advance both the structure and the fluid in one joint
+    system.
+\end{frame}
+
+\begin{frame}
+    \frametitle{Definitions \& Goals}
+    \begin{itemize}
+        \item \emph{Superconvergence}: accuracy at points known \emph{a priori}
+              exceeds global rate
+        \item
+    \end{itemize}
+    \pause
+    \begin{itemize}
+        \item Achieve more accurate than usual boundary derivatives
+        \item
+        \item No need for subiterations (\(O(10)\) to \(O(100)\)) for stability
+        \item Arbitrarily high order accuracy
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Governing Equations}
+    Nothing fancy; plain old elliptic PDEs with constant coefficients.
+\end{frame}
+
+\end{document}
