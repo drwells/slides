@@ -1,0 +1,78 @@
+% vector notation
+\newcommand{\va}{\vec{a}}
+\newcommand{\bb}{\vec{b}}
+\newcommand{\cc}{\vec{c}}
+\newcommand{\ff}{\vec{f}}
+\newcommand{\nn}{\vec{n}}
+\newcommand{\uu}{\vec{u}}
+\newcommand{\ww}{\vec{w}}
+\newcommand{\xx}{\vec{x}}
+\newcommand{\twoVector}[2]{\begin{bmatrix} #1 \\ #2 \end{bmatrix}}
+\newcommand{\threeVector}[3]{\begin{bmatrix} #1 \\ #2 \\ #3 \end{bmatrix}}
+\newcommand{\twoVectorT}[2]{\begin{bmatrix} #1 & #2 \end{bmatrix}}
+\newcommand{\threeVectorT}[3]{\begin{bmatrix} #1 & #2 & #3 \end{bmatrix}}
+\newcommand{\fourVectorT}[4]{\begin{bmatrix} #1 & #2 & #3 & #4 \end{bmatrix}}
+\newcommand{\vr}{\vec{v}_r}
+
+% bold commands
+\newcommand{\bx}{{\mathbf x}}
+\newcommand{\by}{{\mathbf y}}
+
+% integral notation
+\newcommand{\dxx}{\,d\xx}
+\newcommand{\dll}{\,d\vec{l}}
+\newcommand{\intO}{\int_\Omega}
+
+\newcommand{\sumT}{\sum_{T\in \mathcal{T}_h}}
+\newcommand{\intT}{\int_T}
+\newcommand{\Th}{\mathcal{T}_h}
+
+% typesetting
+\newcommand{\todo}[1]{{\color{red}#1}}
+\newcommand{\eg}{e.g., }
+\newcommand{\ie}{i.e., }
+\newcommand{\frameBoxShort}[1]{\begin{center} \begin{minipage}{0.8\textwidth}\begin{center}\fbox{#1}\end{center}\end{minipage} \end{center}}
+\newcommand{\frameBox}[1]{\noindent\begin{center} \begin{minipage}{\textwidth}\framebox{#1}\end{minipage} \end{center}}
+
+% SUPG notation
+\newcommand{\eps}{\varepsilon}
+\newcommand{\SDNorm}[1]{||| #1 |||_{SD}}
+\newcommand{\SDRNorm}[1]{||| #1 |||_{\mathrm{SUPG}, r}}
+\newcommand{\SDInner}[2]{a(#1, #2)_{SD}}
+\newcommand{\SUPGRInner}[1]{a(#1)_{\mathrm{SUPG}, r}}
+\newcommand{\half}{1/2}
+\newcommand{\threehalves}{3/2}
+
+% functional analysis
+\newcommand{\abs}[1]{\ensuremath{\left| #1 \right|}}
+\newcommand{\Norm}[1]{\ensuremath{\| #1 \|}}
+\newcommand{\Norms}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\Seminorm}[1]{\ensuremath{| #1 |}}
+\newcommand{\Seminorms}[1]{\ensuremath{\left| #1 \right|}}
+\newcommand{\Langles}[1]{\left\langle#1\right\rangle}
+\newcommand{\Brackets}[1]{\ensuremath{\left\{#1\right\}}}
+
+% POD notation
+\newcommand{\snapsum}{\sum_{n = 0}^{R - 1}} % sum of snapshots
+\newcommand{\remainder}[1]{\sum_{#1 = r}^{R - 1}} % sum from r to R - 1
+\newcommand{\podsum}[1]{\sum_{#1 = 0}^{r - 1}} % sum of POD vectors
+% (uh(., tl), phij(.))
+\newcommand{\inl}[1]{\Langles{u_n, \phi_{#1}}}
+\newcommand{\podvec}{\vec{\varphi}}
+\newcommand{\OO}{\mathcal{O}}
+
+% NS notation
+\newcommand{\reinv}{\dfrac{1}{Re}}
+
+% NS and POD notation
+\newcommand{\usteady}{\uu_s}
+\newcommand{\podgalerkin}{\usteady + \podsum{j} a_j(t) \podvec_j(\xx)}
+\newcommand{\podgalerkinx}{\uu_{s0} + \podsum{j} a_j(t) \varphi_{j0}(\xx)}
+
+\newcommand{\evaluateBetween}[2]{\, \biggr\rvert_{#1}^{#2}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\mult}{\dfrac{1}{(2 \pi)^{n/2}}}
+\newcommand{\multt}{\dfrac{1}{\sqrt{2 \pi}}}
+
+% filtering notation
+\newcommand{\FF}{\mathcal{F}}
