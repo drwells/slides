@@ -1,0 +1,94 @@
+\begin{tikzpicture}[scale=1.5]
+    %% leftmost pair
+    % cubic square
+    \draw[-, thick] (-1.0, 0.0) -- (-1.0, 1.0);
+    \draw[-, thick] (0.0, 0.0) -- (0.0, 1.0);
+    \draw[-, thick] (-1.0, 0.0) -- (0.0, 0.0);
+    \draw[-, thick] (-1.0, 1.0) -- (0.0, 1.0);
+
+    % linear square
+    \draw[-, thick] (-1.0, -1.0) -- (-1.0, 0.0);
+    \draw[-, thick] (0.0, -1.0) -- (0.0, 0.0);
+    \draw[-, thick] (-1.0, -1.0) -- (0.0, -1.0);
+    \draw[-, thick] (-1.0, 0.0) -- (0.0, 0.0);
+
+    % cubic support points
+    \foreach \x in {0,...,4}
+    \foreach \y in {0,...,4}
+        \draw (0.25*\x - 1.0, 0.25*\y) node[cross] {};
+
+    % linear support points
+    \foreach \x in {0,...,1}
+    \foreach \y in {0,...,1}
+        \draw (\x - 1.0, \y - 1.0) circle (2pt);
+
+    %% second pair
+    % cubic square
+    \draw[-, thick] (0.0, 0.0) -- (0.0, 1.0);
+    \draw[-, thick] (1.0, 0.0) -- (1.0, 1.0);
+    \draw[-, thick] (0.0, 0.0) -- (1.0, 0.0);
+    \draw[-, thick] (0.0, 1.0) -- (1.0, 1.0);
+
+    % linear square
+    \draw[-, thick] (0.0, -1.0) -- (0.0, 0.0);
+    \draw[-, thick] (1.0, -1.0) -- (1.0, 0.0);
+    \draw[-, thick] (0.0, -1.0) -- (1.0, -1.0);
+    \draw[-, thick] (0.0, 0.0) -- (1.0, 0.0);
+
+    % cubic support points
+    \foreach \x in {0,...,4}
+    \foreach \y in {0,...,4}
+        \draw (0.25*\x, 0.25*\y) node[cross] {};
+
+    % linear support points
+    \foreach \x in {0,...,1}
+    \foreach \y in {0,...,1}
+        \draw (\x, \y - 1.0) circle (2pt);
+
+    \draw[->, thick] (1.5, 0.0) -- (2.5, 0.0);
+
+    % cubic square
+    \draw[-, thick] (3.0, 0.0) -- (3.0, 1.0);
+    \draw[-, thick] (4.0, 0.0) -- (4.0, 1.0);
+    \draw[-, thick] (3.0, 0.0) -- (4.0, 0.0);
+    \draw[-, thick] (3.0, 1.0) -- (4.0, 1.0);
+
+    % linear square
+    \draw[-, thick] (3.0, -1.0) -- (3.0, 0.0);
+    \draw[-, thick] (4.0, -1.0) -- (4.0, 0.0);
+    \draw[-, thick] (3.0, -1.0) -- (4.0, -1.0);
+    \draw[-, thick] (3.0, 0.0)  -- (4.0, 0.0);
+
+    % cubic support points
+    \foreach \x in {0,...,1}
+    \foreach \y in {0,...,4}
+        \draw (3.0 + \x, 0.25*\y) node[cross] {};
+
+    % linear support points
+    \foreach \x in {0,...,1}
+    \foreach \y in {0,...,1}
+        \draw (3.0 + \x, \y - 1.0) circle (2pt);
+
+    %% rightmost pair
+    % cubic square
+    \draw[-, thick] (4.0, 0.0) -- (4.0, 1.0);
+    \draw[-, thick] (5.0, 0.0) -- (5.0, 1.0);
+    \draw[-, thick] (4.0, 0.0) -- (5.0, 0.0);
+    \draw[-, thick] (4.0, 1.0) -- (5.0, 1.0);
+
+    % linear square
+    \draw[-, thick] (4.0, -1.0) -- (4.0, 0.0);
+    \draw[-, thick] (5.0, -1.0) -- (5.0, 0.0);
+    \draw[-, thick] (4.0, -1.0) -- (5.0, -1.0);
+    \draw[-, thick] (4.0, 0.0)  -- (5.0, 0.0);
+
+    % cubic support points
+    \foreach \x in {0,...,1}
+    \foreach \y in {0,...,4}
+        \draw (4.0 + \x, 0.25*\y) node[cross] {};
+
+    % linear support points
+    \foreach \x in {0,...,1}
+    \foreach \y in {0,...,1}
+        \draw (4.0 + \x, \y - 1.0) circle (2pt);
+\end{tikzpicture}

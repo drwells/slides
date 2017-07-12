@@ -1,0 +1,146 @@
+\begin{frame}
+    \frametitle{Definitions}
+    \begin{itemize}
+        \item \emph{knots:} vertices of the grid (corners in 2D, faces in 1D)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Assumptions}
+    \begin{itemize}
+        \item Linear, constant coefficient elliptic PDEs, Dirichlet (or
+              periodic) boundary conditions
+              \pause
+        \item \emph{Lots} of regularity
+              \pause
+        \item Uniform grid (constant \(\Delta x\), \(\Delta y\)) of tensor
+              product elements (no triangles)
+              \pause
+        \item Continuous finite element spaces:
+              \begin{itemize}
+                  \item in 1D, degree \(n\) on interior elements, degree \(n +
+                        p\) on nonperiodic edge elements
+                  \item in 2D, bilinear on interior elements, degree \(1 \otimes
+                        1 + p\) on nonperiodic edge elements
+              \end{itemize}
+              \pause
+        \item Optimal \(L^\infty\) estimates in 1D:
+              \begin{equation}
+                  \left\|\dfrac{d^m}{dx^m}(u - u^h)\right\|
+                  \leq C \left\|\dfrac{d^{m + 1}}{dx^{m + 1} u}\right\|
+                  \Delta x^{n + 1- m}
+              \end{equation}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Superconvergence in 1D}
+    Classic result: \(-u_{xx} = f\) has \emph{zero error} at the knots (cell faces).
+    \pause
+
+    \emph{proof:} (Arnold et al, 1972)
+    \begin{align*}
+        u^h(i \Delta x) - u(i \Delta x)
+        &= a(G_{i\Delta x}(x), u^h - u)                                       \\
+        &= a(G_{i\Delta x}(x) - v^h, u^h - u)                                 \\
+        &\leq C \|G_{i\Delta x}(x) - v^h\|_{H^1} \|u^h - u\|_{H^1}
+    \end{align*}
+    \pause
+    \begin{itemize}
+        \item \(G_{i\Delta x}\) is the Green's function
+        \item \(G_{i \Delta x}\) is piecewise linear
+              \(\Rightarrow G_{i\Delta x} \in V^h\)
+        \item Pick \(G_{i\Delta x} = v^h\): no knot error!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Superconvergence in 1D}
+    Same idea for \(-u_{xx} + b u_x + c u = f\), \(V^h =\) piecewise
+    polynomials of degree \(n\):
+    \pause
+    \begin{align*}
+        u^h(i \Delta x) - u(i \Delta x)
+        &= a(G_{i\Delta x}(x), u^h - u)                                       \\
+        &= a(G_{i\Delta x}(x) - v^h, u^h - u)                                 \\
+        &\leq C_1 \|G_{i\Delta x}(x) - v^h\|_{H^1} \|u^h - u\|_{H^1}
+        &\leq C_2 \Delta x^{2 k}.
+    \end{align*}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Superconvergence in 1D}
+    Useful special case if the last cell consists of piecewise polynomials of
+    degree \(n + p\), \(p \geq 1\), then
+    \begin{equation}
+        |u(1 - \Delta x) - u^h(1 - \Delta x)| \leq C \Delta x^{2 n + 1}
+    \end{equation}
+    \pause
+    \emph{Proof}:
+    \begin{itemize}
+        \item Same work as before: knot error is bounded by global error times
+              Green's function (interpolation) error
+        \item To the left of \(1 - \Delta x\): derivatives of the Green's
+              function scale like \(O(\Delta x) \Rightarrow\) we gain an
+              approximation order
+        \item To the right of \(1 - \Delta x\): \(p \geq 1 \Rightarrow\) we gain
+              (at least) one approximation order
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Improving boundary derivative convergence in \(1D\)}
+    For
+    \begin{equation*}
+        -u_{xx} = f
+    \end{equation*}
+    \pause
+    \begin{equation}
+        \left\|(\dfrac{d^m}{dx^m}(u - u^h))(1)\right\|
+        \leq C \Delta x^{n + p + 1 - m}
+    \end{equation}
+    \pause
+    \begin{itemize}
+        \item FE scheme on the boundary cell:
+              \begin{itemize}
+                  \item \(y^h(1 - \Delta x) = u^h(1 - \Delta x)\)
+                  \item \(y^h(1) = u^h(1)\)
+              \end{itemize}
+              \pause
+        \item No knot errors: \(y^h(1 - \Delta x) = u(1 - \Delta x)\),
+              \(y^h(1) = u(1)\)
+        \item Estimates on last cell \emph{don't rely on the rest of the
+              domain}
+        \item Equivalent, discretely, to just doing plain \(p\)-refinement on
+              the last cell.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Improving boundary derivative convergence in 1D}
+    For
+    \begin{equation*}
+        -u_{xx} + b u_x + c u = f
+    \end{equation*}
+    \pause
+    \begin{equation}
+        \left\|(\dfrac{d^m}{dx^m}(u - u^h))(1)\right\|
+        \leq C_1 \Delta x^{n + p + 1 - m}
+        + C_2 \Delta x^{2 n - 1}
+
+    \end{equation}
+    \pause
+    \begin{itemize}
+        \item Same as the Laplace equation (\(C_1\)), but with a nonzero coupling error
+              (saved by better knot estimate, \(C_2 \Delta x^{2 n - 1}\))
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Numerical Results in 1D}
+    It works!
+\end{frame}
+
+\begin{frame}
+    \frametitle{Simple Extension to 2D}
+\end{frame}
