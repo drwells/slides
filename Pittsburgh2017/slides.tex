@@ -27,6 +27,7 @@
 \newcommand*{\vcenterimage}[1]{\vcenter{\hbox{\includegraphics[width=2in]{#1}}}}
 \newcommand*{\vcenterarrow}{\vcenter{\hbox{$\Longrightarrow$}}}
 
+\DeclareMathOperator{\hyphen}{-}
 
 \definecolor{RPIred}{rgb}{ 0.87,0.12, 0.20}
 \definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
@@ -51,7 +52,7 @@ cross/.default={2.5pt}}
 
 
 \frame{
-\title{\Large Improving Boundary Derivative Accuracy with \(p\)-Refinement}
+\title{\Large Improving Boundary Derivative Recovery in Elliptic PDEs}
 
 \author{{\Large David Wells \\\vspace{0.1in} Rensselaer Polytechnic Institute}\\
 \vspace{0.2in} {In collaboration with:\\{}J. W. Banks, F. Li}}
@@ -84,7 +85,7 @@ cross/.default={2.5pt}}
         \begin{itemize}
             \item Efficient numerical methods for elliptic PDEs
             \item Increased accuracy in (normal) boundary derivatives
-            \item No postprocessing
+            \item No postprocessing (achieve an energy estimate)
             \item Order \(n + 1\) data should lead to order \(n + 1\) derivatives
         \end{itemize}
     \end{frame}
@@ -170,7 +171,7 @@ cross/.default={2.5pt}}
 
 \begin{frame}
     \frametitle{Superconvergence in 1D}
-    Same idea for \(-u_{xx} + b u_x + c u = f\):
+    Same idea for \(-u_{xx} + b u_x + c u = f\) (Arnold et al, 1974):
     \pause
     \begin{align*}
         |u^h(i \Delta x) - u(i \Delta x)|
@@ -224,7 +225,7 @@ cross/.default={2.5pt}}
               \pause
         \item No knot errors
         \item Estimates on last cell \emph{don't rely on the rest of the
-              domain}
+              domain} (coupling has zero error)
         \item Equivalent, discretely, to just doing plain \(p\)-refinement on
               the last cell
     \end{itemize}
@@ -249,8 +250,9 @@ cross/.default={2.5pt}}
     \end{itemize}
     \pause
     \begin{center}
-        \(n = 1, p = 2 \Rightarrow\) a second order accurate second derivative
-        on the boundary.
+        \(m = 2, n = 1, p = 2 \Rightarrow\) linears everywhere, cubics on
+        boundary cells; a second order accurate second derivative on the
+        boundary.
     \end{center}
 \end{frame}
 
@@ -305,15 +307,27 @@ cross/.default={2.5pt}}
 
 \begin{frame}
     \frametitle{Extensions to 2D}
+    Linear elements in \(x \Rightarrow\) centered differences in \(x\):
+    \begin{align*}
+        D^0 U_i &= \dfrac{U_{i + 1} - U_{i - 1}}{2 \Delta x}                  \\
+        D^+ D^- U_i &= \dfrac{U_{i + 1} - 2 U_i + U_{i - 1}}{\Delta x^2}
+    \end{align*}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Extensions to 2D}
     \begin{itemize}
-        \item Discretize in \(x\) and consider a semidiscretization in \(y\)
-        \item Linear elements in \(x \Rightarrow\) centered differences in \(x\)
+        \item Discrete in \(x\), continuous in \(y\)
         \item The solution in \(x\) is a superposition of grid eigenfunctions
               \(\exp(I k x_i) \Rightarrow\) calculate errors for each \(k\) and
               sum them up via inverse discrete Fourier transform
     \end{itemize}
     \pause
     \vspace{0.25in}
+    \begin{equation*}
+        u(x_i, y) \approx \sum_{k = -N/2}^{N/2} \exp(I k x_i) Y_k(y)
+    \end{equation*}
+    \pause
     \begin{equation*}
         -Y_k''(y)
         + b_2 Y_k'(y)
@@ -358,10 +372,38 @@ cross/.default={2.5pt}}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Elimination of nonnormal \(p\)-refinement}
+    \frametitle{Numerical Results}
+    Manufactured solution with \(\vec{b} = (1, 1)\) and \(c = 2\):
+    \begin{equation*}
+        u(x, y) = (y^3 + \exp(-y^2) + \sin(4.5 y^2) + \sin(20 y)) (20 \cos(4 \pi x)
+        + 0.1 \sin(20 \pi x) - 80 \sin(6 \pi x))
+    \end{equation*}
+    \pause
+    \(H^1{\hyphen}B\) error defined as
+    \begin{equation*}
+        \max_{i, j}
+        \left|
+        (\nabla u^h \cdot \vec{n} -
+        \nabla u \cdot \vec{n})(\delta_i, \delta_j)
+        : (\delta_i, \delta_j) \in \partial \Omega^h
+        \right|
+    \end{equation*}
+    and \(H^2{\hyphen}B\) error defined as
+    \begin{equation*}
+        \max_{i, j}
+        \left|
+        (\vec{n}^T \Delta u^h \cdot \vec{n} -
+        \vec{n}^T \Delta u \cdot \vec{n})(\delta_i, \delta_j)
+        : (\delta_i, \delta_j) \in \partial \Omega^h
+        \right|.
+    \end{equation*}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Numerical Results}
     \begin{figure}
         \centering
-
+        Elimination of nonnormal \(p\)-refinement:
         \include{constraints}
         \caption{Depiction of normal \(p\)-refinement scheme, with elimination
         of extra DoFs. Linear DoFs are circles, quartic are crosses.}
