@@ -1,0 +1,497 @@
+\documentclass[8pt]{beamer}
+
+\usetheme{Darmstadt}
+\usecolortheme{dove}
+\usepackage[small,center]{caption}
+\usepackage{times}
+\usefonttheme{structurebold}
+\usepackage[english]{babel}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb}
+\usepackage{amsxtra}
+
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{shapes.misc}
+
+\newcommand{\leftd}[1]{{\color{red} \bar{#1}}}
+\newcommand{\interface}[2]{{\color{blue}{#1}_I(#2)}}
+\newcommand{\leftdd}[2]{{\color{red} \bar{#1}(\bar{#2})}}
+\newcommand{\leftFourier}[1]{{\color{red} \hat{#1}}}
+\newcommand{\leftFourierTwo}[2]{{\color{red} \hat{#1}(\hat{#2})}}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\divergence}{\mathrm{div}}
+
+\newcommand{\I}{I}
+
+\newcommand{\vst}{\vskip 0.2cm\noindent}
+\newcommand{\vso}{\vskip 0.1cm\noindent}
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\matl}{M{\scriptsize ATLAB }}
+\newcommand{\Div}[1]{\nabla\cdot #1}
+\newcommand{\DIV}[1]{\nabla_{\mathbf{X}} \cdot #1}
+\newcommand{\kk}{\mathcal{K}}
+
+\newcommand{\etal}{\emph{et al}.}
+
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\MM}{\mathbb{M}}
+\newcommand{\FFb}{\overline{\FF}}
+
+\newcommand{\ub}{\boldsymbol{u}}
+\newcommand{\ubf}{\boldsymbol{u}^{\text{f}}}
+\newcommand{\ubs}{\boldsymbol{u}^{\text{s}}}
+\newcommand{\vb}{\boldsymbol{v}}
+\newcommand{\wb}{\boldsymbol{w}}
+\newcommand{\yb}{\boldsymbol{y}}
+\newcommand{\Chib}{\boldsymbol{\chi}}
+\newcommand{\cb}{\boldsymbol{\chi}}
+\newcommand{\xb}{\boldsymbol{x}}
+\newcommand{\Xb}{\boldsymbol{X}}
+\newcommand{\fb}{\boldsymbol{f}}
+\newcommand{\Fb}{\boldsymbol{F}}
+\newcommand{\Ub}{\boldsymbol{U}}
+\newcommand{\UbVecIB}{\vec{\Ub}\vphantom{\Ub}^{\text{IB}}}
+\newcommand{\Vb}{\boldsymbol{V}}
+\newcommand{\Lb}{\boldsymbol{L}}
+\newcommand{\LbVecIB}{\vec{\Lb}\vphantom{\Lb}^{\text{IB}}}
+\newcommand{\Nb}{\boldsymbol{N}}
+\newcommand{\nb}{\boldsymbol{n}}
+\newcommand{\hb}{\boldsymbol{h}}
+\newcommand{\ab}{\boldsymbol{a}}
+\newcommand{\Ab}{\boldsymbol{A}}
+\newcommand{\pb}{\boldsymbol{\phi}}
+
+\newcommand{\cauchy}{\bbsigma}
+\newcommand{\cauchyf}{\bbsigma^{\text{f}}}
+\newcommand{\cauchyv}{\bbsigma^{\text{v}}}
+\newcommand{\cauchys}{\bbsigma^{\text{e}}}
+\newcommand{\cauchysolid}{\bbsigma^{\text{s}}}
+\newcommand{\ztensor}{\mathbb{0}}
+\newcommand{\pstab}{\pi_{\text{stab}}}
+\newcommand{\pf}{\pi^{\text{f}}}
+\newcommand{\ps}{\pi^{\text{s}}}
+\newcommand{\pphys}{p}
+\newcommand{\peul}{\pi}
+\newcommand{\mus}{\mu^{\text{s}}}
+\newcommand{\muf}{\mu^{\text{f}}}
+\newcommand{\rhos}{\rho^{\text{s}}}
+\newcommand{\rhof}{\rho^{\text{f}}}
+\newcommand{\cbs}{\Chib^{\text{s}}}
+\newcommand{\ds}{\boldsymbol{d}^{\text{s}}}
+
+\newcommand{\PPs}{\PP^{\text{e}}}
+\newcommand{\PPsm}{\bar{\PP}^{\text{e}}}
+
+\newcommand{\soliddom}{{\Omega^{\text{s}}_t}}
+\newcommand{\soliddomO}{{\Omega^{\text{s}}_0}}
+\newcommand{\fluiddom}{\Omega^{\text{f}}_t}
+\newcommand{\fluiddomO}{\Omega^{\text{f}}_0}
+\newcommand{\fsinterface}{\Gamma^{\text{fs}}_t}
+\newcommand{\fsinterfaceO}{\Gamma^{\text{fs}}_0}
+\newcommand{\subsolid}{\omega^{\text{s}}_t}
+\newcommand{\subsolidO}{\omega^{\text{s}}_0}
+
+\newcommand{\Wiso}{W^{\text{iso}}}
+\newcommand{\Wb}{\overline{W}}
+
+\newcommand{\PPb}{\bar{\PP}^\text{e}}
+
+\newcommand{\cNHB}{\bar{\cauchy}_{\text{NH}}}
+\newcommand{\dev}{\text{dev}}
+\newcommand{\DEV}{\text{DEV}}
+\newcommand{\efac}{E_\text{FAC}}
+\newcommand{\mfac}{M_\text{FAC}}
+\newcommand{\tr}{\text{tr}}
+\newcommand{\nus}{\nu_\text{stab}}
+\newcommand{\kappas}{\kappa_\text{stab}}
+%\newcommand{\mus}{\mu_\text{s}}
+%\newcommand{\mut}{\mu_\text{T}}
+\newcommand{\mul}{\mu_\text{L}}
+\newcommand{\Gt}{G_\text{T}}
+\newcommand{\Gl}{G_\text{L}}
+\newcommand{\El}{E_\text{L}}
+
+\newcommand{\vol}{\text{vol}}
+\newcommand{\nvol}{\mathcal{N}}
+\newcommand{\supp}{\text{supp}}
+\newcommand{\mm}{\mathcal{M}}
+\newcommand{\mmd}{\mathcal{M}^{\text{1D}}}
+\newcommand{\xib}{\boldsymbol{\xi}}
+\newcommand{\Pone}{\mathcal{P}^1}
+\newcommand{\Ptwo}{\mathcal{P}^2}
+\newcommand{\Qone}{\mathcal{Q}^1}
+\newcommand{\Qtwo}{\mathcal{Q}^2}
+\newcommand{\Bb}{\boldsymbol{B}}
+\newcommand{\order}{\mathcal{O}}
+
+\newcommand{\tria}{{\ensuremath{\mathcal{T}^h}}}
+\newcommand{\euleriandx}{{\ensuremath{\Delta x}}}
+\newcommand{\lagrangiandx}{{\ensuremath{\Delta X}}}
+
+\newcommand{\dAb}{\, \mathrm{d}\Ab}
+\newcommand{\dXb}{\, \mathrm{d}\Xb}
+
+\newcommand{\dxb}{\, \mathrm{d}\xb}
+
+% fix placement of superscripts on characters with tildes
+\newcommand{\tilden}[2]{\ensuremath{\tilde{#1}\vphantom{#1}^{#2}}}
+
+\newcommand{\xface}{{i, j + \half, k + \half}}
+\newcommand{\yface}{{i + \half, j, k + \half}}
+\newcommand{\zface}{{i + \half, j + \half, k}}
+
+% same with transposes and vecs
+\newcommand{\vecT}[1]{\ensuremath{\vec{#1}\vphantom{#1}^T}}
+% getting the arrow to appear nicely over the 1 is surprisingly tricky
+\newcommand{\vecOneT}{%
+  \ensuremath{%
+    \vec{\vphantom{\boldsymbol{1}}\hphantom{-}}% Put an arrow over a box of about the right shape
+    \llap{\ensuremath{\boldsymbol{1}}}% place the symbol to the left of the current location of the cursor
+    ^T%
+  }}
+
+\newcommand*{\vcenterimage}[1]{\vcenter{\hbox{\includegraphics[width=2in]{#1}}}}
+\newcommand*{\vcenterarrow}{\vcenter{\hbox{$\Longrightarrow$}}}
+
+\DeclareMathOperator{\hyphen}{-}
+
+\definecolor{Carolinablue}{RGB}{75, 156, 211}
+\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
+\definecolor{lightgray}{rgb}{0.83, 0.83, 0.83}
+\setbeamercolor{block title}{bg=lightgray,fg=Carolinablue}
+\setbeamercolor{block body}{bg=white,fg=black}
+\setbeamercovered{dynamic}
+\setbeamercolor*{item}{fg=Carolinablue}
+
+\captionsetup[subfigure]{labelformat=empty}
+\captionsetup[figure]{labelformat=empty}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\begin{document}
+
+% tikz stuff
+\tikzset{cross/.style={cross out, draw=black, minimum size=2*(#1-\pgflinewidth),
+inner sep=0pt, outer sep=0pt},
+%default radius will be 1pt.
+cross/.default={2.5pt}}
+
+
+
+\frame{
+  \title{\Large An Approximate Distributed Lagrange Multiplier Method for FSI}
+
+\author{{\Large David Wells, Marshall Davey, Boyce Griffith \\\vspace{0.1in} University of North Carolina}    \\
+\vspace{0.2in} {Cardiovascular Modeling and Simulation Lab}}
+
+\date{April 26, 2022\\{}}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1.5in]{UNC_logo_542.eps}
+ \end{figure}%
+
+\vspace{-0.2in}
+\titlepage
+}
+
+\section{Overview}
+\begin{frame}
+    \frametitle{Overview}
+    {\large Topics}
+    \begin{itemize}
+    \item[$\blacksquare$] Partitioned FSI methods
+    \item[$\blacksquare$] Distributed Lagrange Multiplier, both exact and approximate
+    \item[$\blacksquare$] Numerical results and future work
+    \end{itemize}
+\end{frame}
+
+\section{Background}
+\begin{frame}
+    \frametitle{Timestepping with IBFE}
+    %% TODO include a pic
+    IBFE typically relies on explicit timestepping for the structure:
+    \begin{itemize}
+      \item Update the structure position with Cartesian grid velocity (IB method)
+      \item Compute a force at the new configuration
+      \item Apply force from structure to Cartesian grid (IB method)
+      \item Do another fluid solve and update the structure position again
+    \end{itemize}
+    This method is \emph{partitioned}:
+    \begin{itemize}
+      \item Finite differences on Cartesian grids for the momentum solve
+      \item Finite elements on general unstructured meshes for the solid mechanics parts
+      \item Staggered evolution (we don't solve both at the same time)
+      \item Volumetric IB coupling (velocity interpolation, force spreading) to
+        avoid several typical instabilities (e.g., added mass)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Timestepping with IBFE}
+    %% TODO include a pic
+    This has some very attractive advantages:
+    \begin{itemize}
+      \item Finite element solves are relatively nice (just mass matrices)
+      \item Easy to implement for users: just set up a force dependent on the
+        current configuration and displacement gradient (our friend
+        \texttt{IBAMR::PK1StressFcnData})
+    \end{itemize}
+    and some issues:
+    \begin{itemize}
+      \item Can't reuse an existing solid mechanics code
+      \item stiff material models and explicit timestepping require small timesteps. Materials like steel or nitinol: \emph{very} small timesteps
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Enforcing constraints with Lagrange Multipliers}
+    Consider the Stokes equations:
+    \begin{align}
+      -\Delta u + \nabla p &= f \\
+      -\nabla \cdot u      &= 0
+    \end{align}
+    These result in a linear system like
+    \begin{equation}
+      \begin{pmatrix}
+        A & B^T \\
+        B & 0 \\
+      \end{pmatrix}
+      \begin{pmatrix}
+        u^h \\ p^h
+      \end{pmatrix}
+      =
+      \begin{pmatrix}
+        F \\ 0
+      \end{pmatrix}
+    \end{equation}
+    With FEM: the pressure is a \emph{Lagrange Multiplier} enforcing (weak)
+    incompressibility. DLM uses a similar mathematical framework for prescribing
+    velocities between domains.
+\end{frame}
+
+\section{Distributed Lagrange Multiplier Methods (DLMs)}
+\begin{frame}
+  \frametitle{Historical Development of DLM}
+  Glowinski, 1999
+  \begin{itemize}
+    \item \emph{Fundamentally variational}: constraints enforced with projection (``degenerate Stokes'')
+    \item \emph{Fractional Step}: relies on operator splitting
+      (incompressibility, advection-diffusion, and rigid body motion with the
+      Lagrange multiplier)
+    \item \emph{Fictitious domains}: builds upon that literature
+  \end{itemize}
+
+  \begin{align}
+    \int u_t \cdot \phi + \mathrm{Re} \nabla u : \nabla \phi + (u \cdot \nabla) u \cdot \phi
+    - p \nabla \cdot \phi dx
+    &= \int f \cdot \phi + \lambda \cdot \phi dx, \forall \phi \in X \\
+    \int q \nabla \cdot u dx &= 0, \forall q \in Q  \\
+    \int \mu (u - g) dx &= 0, \forall \mu \in \Lambda
+  \end{align}
+  in which $g$ is the prescribed motion of some part of the domain and $(X, Q,
+  \Lambda)$ are the velocity, pressure, and Lagrange multiplier spaces.
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Exact DLM}
+  %% TODO - go over this again and compare with Brandsen et al
+  Without operator splitting this looks like (see Brandsen et al)
+  \begin{equation}
+    \begin{pmatrix}
+      A & B^T & L^T \\
+      B & 0   & 0   \\
+      L & 0   & 0   \\
+    \end{pmatrix}
+    \begin{pmatrix}
+      u^h \\ p^h \\ \lambda
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+      F \\ 0  \\ S U^h
+    \end{pmatrix}
+  \end{equation}
+  where $U$ is the structure velocity and $S U^h$ is a prolongation operation
+  (so $S U^h = L u^h$).
+\end{frame}
+
+\begin{frame}
+  \frametitle{DLM Issues}
+  Standard DLM enforces incompressibility and no-slip in a nice way, but it has
+  some drawbacks:
+  \begin{itemize}
+    \item Need mass coupling matrices ($S$), which can be poorly conditioned for
+      cut cells (stabilization methods do exist but this is getting complicated!)
+    \item Timestepping is complex (already at three operators for a simple scheme)
+    \item Difficult to solve block matrix (multiple zero blocks) if we don't do
+      operator splitting
+    \item Inherently monolithic
+  \end{itemize}
+
+  Hence we will consider approximate methods instead.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Approximate DLM}
+
+  The Lagrange multiplier acts as a restorative force. We can approximate it
+  with a spring force and make the coupling a lot simpler.
+
+  This leads to an inexact coupling with two valid structure positions:
+  \begin{itemize}
+    \item $\Chib_\text{IB}(\Xb, t)$: the `IB' (immersed boundary) position,
+      calculated by interpolating velocity in the usual way (for us) from a
+      Navier-Stokes solver
+    \item $\Chib(\Xb, t)$: the `SM' (structural mechanics) position, computed
+      with a solid mechanics solver (or prescribed motion, rigid body motion, etc.)
+  \end{itemize}
+
+  The IB part manages $\Chib_\text{IB}(\Xb, t)$ and the solid mechanics solver manages $\Chib(\Xb, t)$.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Approximate DLM}
+
+  Two tether forces:
+  \begin{align}
+    \Fb_T(\Xb, t) &= \kappa (\Chib(\Xb, t) - \Chib_\text{IB}(\Xb, t)) \\
+    \fb_T(\xb, t) &=
+    \int \kappa (\Chib_\text{IB}(\Xb, t) - \Chib(\Xb, t)) \delta(\xb - \Chib_\text{IB}(\Xb, t)) d\Xb
+  \end{align}
+  %%  TODO - check if these are equal and opposite - I think I have notes on this in the nodal quad paper
+\end{frame}
+
+\begin{frame}
+  \frametitle{Approximate DLM}
+  Structure timestepping:
+  \begin{itemize}
+    \item Use $\Chib_\text{IB}(\Xb, t)$ and $\Ub_\text{IB}(\Xb, t)$ to evaluate
+      $\Fb_T(\Xb, t)$ \emph{explicitly} (like Adams-Bashforth), possibly with
+      Hermite interpolation
+    \item Use our favorite solid mechanics formulation to \emph{implicitly}
+      handle remaining structural dynamics and take a giant timestep
+  \end{itemize}
+
+  Momentum timestepping:
+  \begin{itemize}
+    \item The structure should be `ahead' in time: interpolate $\Chib(\Xb, t)$
+      in time to evaluate $\fb_T(\xb, t)$ as needed
+    \item Advance the momentum solver in the normal way, typically with a
+      smaller timestep
+  \end{itemize}
+  i.e., the only explicit forces are tether forces, which are (typically) not as
+  stiff as material models.
+\end{frame}
+
+\section{Numerical Results}
+\begin{frame}
+  \frametitle{Implementation}
+
+  Joint work with Marshall Davey: \texttt{github.com/IBAMR/project-dlm} (private
+  repo, ask if you want to see it). Uses the new deal.II-based reimplementation.
+
+    \begin{itemize}
+      \item One general class \texttt{DLMMethod} that handles any sort of
+      \item \emph{Coupling happens through sending position/velocity/time tuples
+      back and forth}: SM/IB solvers decide precisely what to do with them
+      \item real implicit solid mechanics solvers (using Newmark-Beta)
+      \item coupling to IBAMR with DLM
+      \item huge work-in-progress: not a lot of actual DLM has been done (just
+        preliminaries)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Progress towards a deal.II-based IFED code}
+    For a 3D example with HEX27 elements, 4 MPI processes:
+    \begin{center}
+    \begin{tabular}{c c c}
+      -          & \texttt{IBAMR::IBFEMethod} & \texttt{fdl::IFEDMethod} \\
+      \hline
+      total time             & 44 minutes   & 26 minutes \\
+      memory (RSS)           & 1622 MB      & 626 MB \\
+      FE solver time         & 12.1 minutes & 1.6 minutes \\
+      force assembly         & 6.2 minutes  & 4.4 minutes \\
+      force spreading        & 5.1 minutes  & 5.5 minutes \\
+      velocity interpolation & 8.3 minutes  & 9.7 minutes \\
+      regridding             & 1 minute     & 0.5 minutes \\
+    \end{tabular}
+    \end{center}
+    \begin{itemize}
+      \item Small stuff adds up: wall time is good even though core IB stuff is
+        slightly slower
+      \item Makes some breaking changes not possible in IBAMR (no more
+        \texttt{IBAMR::PK1StressFcnData}, scratch hierarchy is mandatory)
+      \item Good matrix-free solvers (HEX27 is a very unfair case)
+      \item Better parallelization (IB stuff scatters global data to purely
+        serial data structures)
+      \item Some deal.II stuff is still a (fixable) performance problem (like
+        \texttt{MappingFEField} - computing quadrature points takes up 20\% of
+        run time)
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Convergence for Prescribed Motion}
+    Parameters:
+    \begin{itemize}
+      \item $\mfac = 2$, bilinear elements, $\Delta t = \Delta x / 16$,
+        bspline-3
+      \item $\kappa = 1000 \Delta x$ (disagrees with IIM scaling!)
+    \end{itemize}
+    Exact solution:
+    \begin{align}
+      u &= \sin(\pi x) y + \cos(2 pi (y - t)) \\
+      v &= -\dfrac{1}{2} \pi y^2 \cos(\pi x) \\
+      p &= \sin(x) + \cos(t)
+    \end{align}
+
+    This is second-order accurate for the Cartesian grid $L^2$ norm (FE error is
+    obviously second-order)
+\end{frame}
+
+\begin{frame}
+    \frametitle{Convergence for Actual FSI}
+    This is more work-in-progress.
+    \begin{itemize}
+      \item $\mfac = 2$, bilinear elements, $\Delta t = \Delta x / 16$,
+        bspline-3
+      \item $\kappa = 1$ (disagrees with IIM scaling!)
+    \end{itemize}
+    Exact solution:
+    \begin{align}
+      u &= \sin(\pi x) y + \cos(2 pi (y - t)) \\
+      v &= -\dfrac{1}{2} \pi y^2 \cos(\pi x) \\
+      p &= \sin(x) + \cos(t)
+    \end{align}
+
+    The time integrator is IMEX-like: we use an explicit tether force but
+    implicit solid mechanics forces (like AB-2 with trapezoid). This is only
+    first-order accurate right now.
+    \begin{itemize}
+      \item First SM timestep does not capture IB acceleration
+      \item Should we have a quiescent initial condition?
+      \item Is this the right time integrator?
+    \end{itemize}
+\end{frame}
+
+\section{Summary}
+\begin{frame}
+    \frametitle{Future Work}
+    \begin{itemize}
+      \item Next step: rigid body motion (a typical DLM case), this is maybe 25\% done
+      \item Things appear to work with implicit mechanics, but only first-order convergence for SM velocity
+      \item Which boundary conditions should we use for the solid mechanics solver?
+    \end{itemize}
+\end{frame}
+
+\end{document}

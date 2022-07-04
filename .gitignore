@@ -10,3 +10,6 @@
 */*.blg
 */*.out
 */*.snm
+*/*.pdf
+*/*.fdb_latexmk
+*/*.fls
