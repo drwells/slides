@@ -1,0 +1,258 @@
+\documentclass[8pt]{beamer}
+
+\usetheme{Copenhagen}
+\usecolortheme{beaver}
+\usepackage[small,center]{caption}
+\usepackage{times}
+\usefonttheme{structurebold}
+\usepackage[english]{babel}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb,amsthm}
+
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{shapes.misc}
+
+\newcommand*{\vcenterimage}[1]{\vcenter{\hbox{\includegraphics[width=2in]{#1}}}}
+\newcommand*{\vcenterarrow}{\vcenter{\hbox{$\Longrightarrow$}}}
+
+\DeclareMathOperator{\hyphen}{-}
+
+% \definecolor{RPIred}{rgb}{ 0.87,0.12, 0.20}
+\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
+\definecolor{lightgray}{rgb}{0.83, 0.83, 0.83}
+%\setbeamercolor{block title}{bg=lightgray,fg=RPIred}
+\setbeamercolor{block body}{bg=white,fg=black}
+\setbeamercovered{dynamic}
+%\setbeamercolor*{item}{fg=RPIred}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\captionsetup[subfigure]{labelformat=empty}
+\captionsetup[figure]{labelformat=empty}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\begin{document}
+
+\include{notation}
+
+
+
+
+\def\signed #1{{\leavevmode\unskip\nobreak\hfil\penalty50\hskip2em
+  \hbox{}\nobreak\hfil #1 %
+  \parfillskip=0pt \finalhyphendemerits=0 \endgraf}}
+
+\newsavebox\mybox
+\newenvironment{aquote}[1]
+  {\savebox\mybox{#1}\begin{quote}}
+  {\signed{\usebox\mybox}\end{quote}}
+
+
+
+% tikz stuff
+\tikzset{cross/.style={cross out, draw=black, minimum size=2*(#1-\pgflinewidth),
+inner sep=0pt, outer sep=0pt},
+%default radius will be 1pt.
+cross/.default={2.5pt}}
+
+
+
+\frame{
+\title{\Large Cardinal: A framework for doing FSI with deal.II + IBAMR}
+
+\author{{\Large David Wells \\\vspace{0.1in} University of North Carolina, Chapel Hill}\\
+\vspace{0.2in} {In collaboration with:\\{}Laryssa Abdala, Marshall Davey, Simone Rossi, Boyce Griffith}}
+
+\date{August 12 2024\\{} deal.II Workshop}
+
+\begin{figure}[h]
+\centering
+%\includegraphics[width=1.5in]{RPI_letterhead.pdf}
+ \end{figure}%
+
+\vspace{-0.2in}
+\titlepage
+}
+
+\section{Introduction to Cardinal}
+\begin{frame}
+    \frametitle{Governing Equations}
+    Uses the immersed-boundary finite element / finite difference method (IFED) (Boffi and Heltai)
+    \begin{itemize}
+      \item \emph{Eulerian} finite difference method for Navier-Stokes
+      \item \emph{Lagrangian} finite element method for mechanics
+    \end{itemize}
+
+    \begin{align*}
+        \rho \frac{D\ub}{Dt}(\xb, t) &= -\nabla p(\xb, t)
+        + \mu \nabla ^2 \ub(\xb, t) + \fb(\xb, t),
+        \\
+        \nabla \cdot \ub(\xb, t) &= \, 0
+        \\
+        % no PPs yet
+        \fb(\xb, t) &= \int_{\soliddomO} \Fb(\Xb,t) \, \delta(\xb - \Chib (\Xb,t)) \dXb
+        \\
+        \frac{\partial \Chib}{\partial t}(\Xb, t) &= \ \Ub(\Xb,t) = \int_{\Omega}
+        \ub(\xb, t) \, \delta(\xb - \Chib (\Xb,t)) \dxb
+        \\
+        \int_{\soliddomO} \Fb(\Xb,t) \cdot \psib(\Xb) \dXb &=
+        -\int_{\soliddomO} \PPs(\Xb,t) : \nabla_{\Xb} \psib(\Xb) \dXb
+    \end{align*}
+
+    \begin{center}
+      The structure's velocity $\frac{\partial \Chib}{\partial t}$ is \emph{interpolated} from the fluid $\ub$; the force on the fluid $\fb$ is \emph{spread} from the structure $\Fb$.
+    \end{center}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Regularized Delta Functions} Heart of the IB method: we replace
+    $\delta(\xb)$ with $\delta_h(\xb)$. Here, $\delta_h(\xb)$ has a width of $2 \Delta x$.
+
+    \begin{figure}
+      \centering
+      \begin{tabular}{c c}
+        \includegraphics[width=0.4\linewidth]{interactionstencils/elemental_stencil.pdf} &
+        \includegraphics[width=0.4\linewidth]{interactionstencils/nodal_stencil.pdf}
+      \end{tabular}
+
+      Can either evaluate the integral operators with Gauss quadrature (left) or
+      nodal quadrature (right). Not shown to scale!
+    \end{figure}
+
+    IBAMR implements FDM and IB methods - use deal.II for all unstructured grid things.
+\end{frame}
+
+\begin{frame}
+    \frametitle{Goals}
+    %%% TODO: picture!
+    What is this project all about? Haven't people already done everything with the IB method?
+    \begin{itemize}
+      \item Immersed methods (not cut cells), neutral buoyancy. IFED now, IIM soon.
+      \item Modern fiber-reinforced material models.
+      \item All features are available through input files.
+      \item Parallel (FEBio has more features but will probably never support MPI).
+      \item Students can do interesting things with it and \emph{not} write 5000 line monoliths
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Brief History}
+    How did we get here?
+    \begin{itemize}
+      \item 2018: four-chambered-heart. Realistic cardiac dynamics with libMesh!
+      \item 2020: deal.II with simplices is ``not impossible'' (what did we write on the wiki?)
+      \item 2021: four-chambered-heart, IBAMR, deal.II (fiddle)
+      \item 2022: I write another libMesh-based paper
+      \item 2023: Heart model (Davey) plus IFED (me) plus electrocardiology (Abdala, Rossi)
+      \item 2024: Realistic valve dynamics with deal.II
+    \end{itemize}
+\end{frame}
+
+\section{Rest of the talk}
+\begin{frame}
+  \frametitle{What is this talk about?}
+  \begin{itemize}
+    \item All the problems Laryssa and I ran into
+    \item Interesting Cardinal features
+    \item Ideas for improving other deal.II apps
+  \end{itemize}
+
+  \vfill
+
+  \begin{center}
+    Framing: eliminating the three kinds of waste (muda, mura, muri).
+  \end{center}
+\end{frame}
+
+\section{Who are we?}
+\begin{frame}
+    \frametitle{Who are we?}
+    We are...
+    \begin{itemize}
+      \item Faculty members, research scientists, postdocs
+      \item Decades of C++ experience
+      \item Formal training in mathematics, computer science
+    \end{itemize}
+
+    Our jobs are...
+    \begin{itemize}
+      \item dev ops (who is going to fix the CI?)
+      \item write proposals
+      \item teach classes
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Who are graduate students?}
+    \begin{aquote}{W. Edwards Deming}
+      Put a good person in a bad system and the bad system wins, no contest.
+    \end{aquote}
+
+    Students are...
+    \begin{itemize}
+      \item Smart
+      \item Know a lot about subject areas (biomechanics, electrophysiology)
+      \item New to scientific computing
+    \end{itemize}
+
+    \vfill
+    Students do not have...
+    \begin{itemize}
+      \item Years of C++ experience
+      \item Years of engineering experience
+      \item Formal training in computer science
+    \end{itemize}
+\end{frame}
+
+\section{Muda}
+\begin{frame}
+  \frametitle{Muda - non-value-added work}
+  \begin{aquote}{Sigeo Shingo}
+    The most dangerous kind of waste is the waste we do not recognize.
+  \end{aquote}
+  What do we actually do that is of value?
+
+  \pause
+
+  \begin{itemize}
+    \item Graduate students
+    \item Write papers
+    \item Ship software
+  \end{itemize}
+
+  Everything else is either necessary (e.g., write grants) or unnecessary
+  (should be removed).
+\end{frame}
+
+\begin{frame}
+  \frametitle{non-value-added work}
+
+  Some non-value-added work. If we watch our students - what are they doing?
+  \begin{itemize}
+    \item Compiling code (\emph{fixes}: ccache, CI, better hardware, use \texttt{-O1})
+    \item Debugging (\emph{don't write bugs!})
+    \item Running everything in debug mode (too slow!)
+    \item Managing dependencies, upgrades, system administration
+    \item Typing too slowly or inaccurately
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{non-value-added work: compiling}
+
+  Various performance improvements are not obvious - students don't have the vocabulary.
+  \begin{itemize}
+    \item \texttt{make} to \texttt{ninja} (what is \texttt{-j4}?)
+    \item \texttt{-O3} to \texttt{-O1} (multiple builds?)
+    \item \texttt{ccache} (what are object files?)
+    \item Make the CI fail fast, finish in 5 minutes
+    \item Trickery to make \texttt{-DDEBUG} work with \texttt{-O1} and not \texttt{-g}
+  \end{itemize}
+\end{frame}
+
+\section{Mura}
+
+\section{Muri}
+
+\end{document}

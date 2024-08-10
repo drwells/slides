@@ -1,0 +1,302 @@
+* Introduction to Cardinal
+** Physics
+- biological fluid-structure interaction (FSI) and electrophysiology (EP)
+** Software
+- IBAMR for the IB method and finite differences
+- deal.II for solid mechanics
+- PETSc for now (I need to rewrite other people's code to use MatrixFree)
+
+Uses simplices about 100% of the time (wouldn't exist without all the work we
+did in 2020 to support tetrahedra)
+** Goals
+- people can do interesting things by only modifying input files
+- extendible with plugins and minimal boiler-plate (need a new material model?
+  Should not require much code past writing the material model itself)
+- can run in parallel (FEBio is great but it will never run on multiple cores)
+** History, Part 1: four-chambered-heart (2018 - 2022)
+- full heart model (realistic valve dynamics) in libMesh + IBAMR
+- libMesh is like deal.II but everything has a slightly different name and place
+- libMesh has simplices but lacks major features (no =MatrixFree=, no
+  higher-order elements, no orientations, no equivalent to =VectorTools=)
+- four-chambered-heart is a monolith - works well for exactly one mesh and
+  problem, can't handle anything else
+** History, Part 2: deal.II + simplices (2020 - present)
+- we had a lot of time on our hands for *some reason*
+- everyone thought it was impossible until Peter did it
+** History, Part 3: fiddle (2021 - 2024)
+- four-chambered heart + IBAMR + deal.II
+- mostly a proof of concept to investigate how we can scalably implement
+  immersed finite element / finite difference methods with deal.II + IBAMR
+- I publish some more papers using the libMesh implementation
+- Now merged with Cardinal
+** History, Part 4: Cardinal (2023 - present)
+- Laryssa Abdala's thesis: full electrocardiology simulations of the heart
+  (FSI + EP), the original heart model isn't going to cut it for a lot of
+  reasons
+- One library containing all the FE stuff we need (for standalone
+  electrocardiology) plus FSI (with IBAMR)
+* Involving students
+- Students are here to learn and need reasonably challenging tasks
+- Rule of Thumb (from Andrew Huberman): students should get things right about
+  85% of the time, wrong about 15% of the time.
+
+Put amusing AI art here
+* Who are we?
+** Who are our students?
+Students are...
+- smart
+- know a lot about their subject area (biomechanics, electrophysiology)
+- work hard
+
+Students don't have...
+- decades of C++ experience
+- decades of engineering experience
+- formal training in computer science
+** Who are we?
+Academia has an excessively long list of responsibilities
+- basic dev ops (managing servers, docker containers, etc)
+- hardcore C++ programmers
+- write multimillion dollar proposals
+- teach freshman calculus
+
+Too many responsibilities - we have to be very efficient with our time.
+* Interesting student problems
+** Relying on invariants to report errors quicker
+Objects in Cardinal have unique names for a few reasons:
+#+BEGIN_SRC
+Parts {
+   Part_Left_PA_Ext {
+      filename     = "whf_pa_ext2_cap.e"
+      fe_degree    = FE_DEGREE
+      // Shifts are applied after scales.
+      shift_vector = -10.0, -8.5, -8.0
+      // convert mm to cm
+      scale_factor = 0.1
+      ForceContribution_Dilatational {
+         type                  = "JLogJ_volumetric_energy"
+         bulk_modulus          = BULK_MODULUS
+         even_order_quadrature = TRUE
+         n_points_1D           = 1
+      }
+   }
+}
+#+END_SRC
+- Input file (also from =SAMRAI=) enforces uniqueness of database names
+- =SAMRAI::tbox::RestartManager= requires globally unique object names
+- =cardinal::StatisticOutput= uses names to create HDF5 groups
+
+So the input file checker also verifies that (most of) the restart database and
+statistical output are valid since object names are the same.
+** "What's a plugin?" "What's a callback?"
+- Students can't use these patterns if they have never heard of them (they just
+  copy-paste everything and change a few lines)
+- I know to read Aspect's source code, they don't
+
+Plugins in Cardinal:
+#+BEGIN_SRC
+  template <int dim, int spacedim = dim>
+  using ActiveStrainFactory =
+    std::function<std::unique_ptr<ActiveStrain<dim, spacedim>>(
+      const tbox::Pointer<tbox::Database>,
+      const std::shared_ptr<DoFHandler<dim, spacedim>> &,
+      const std::shared_ptr<FiberNetwork<dim, spacedim>> &)>;
+#+END_SRC
+#+BEGIN_SRC
+  template <int dim, int spacedim = dim>
+  class Plugins
+  {
+  public:
+    void
+    add_active_strain_factory(
+      const std::string                        &type,
+      const ActiveStrainFactory<dim, spacedim> &factory);
+
+    const std::map<std::string, ActiveStrainFactory<dim, spacedim>> &
+    get_active_strain_factories() const;
+  }
+Makes more objects available for parsing from the input database.
+#+END_SRC
+I decided to use factory functions and require users to recompile =main()=
+instead of "real" plugins which use =dlopen()=.
+** Bad for-loop
+#+BEGIN_SRC
+    for (unsigned int i = 0; m_ionic_parts.size(); i++)
+      {
+        m_ionic_parts[i].save(archive, version);
+      }
+#+END_SRC
+#+BEGIN_SRC
+An error occurred in line <1050> of file <[...]/dealii-9.5.1/source/base/utilities.cc> in function
+    void dealii::Utilities::System::posix_memalign(void**, std::size_t, std::size_t)
+The violated condition was:
+    ierr == 0
+Additional information:
+    Your program tried to allocate some memory but this allocation failed.
+    Typically, this either means that you simply do not have enough memory
+    in your system, or that you are (erroneously) trying to allocate a
+    chunk of memory that is simply beyond all reasonable size, for example
+    because the size of the object has been computed incorrectly.
+
+    In the current case, the request was for 18410715276690587648 bytes.
+#+END_SRC
+Also caused utterly inscrutable stack traces.
+
+Lets do a five-why analysis: My program failed.
+1. Why? My vector tries to allocate 16 exabytes of memory.
+2. Why? Clearly (to an expert) reading uninitialized memory.
+3. Why? Walked off the end of an array.
+4. Why? No range checks.
+5. Why? We don't have a way to turn on range checks automatically
+
+Recommended fix: compile everything with =-D_GLIBCXX_ASSERTIONS= (easy)
+Better fix: set up CI to use =-D_GLIBCXX_DEBUG_PEDANTIC= (harder)
+** statistical output
+- four-chambered-heart: about a dozen ad-hoc text files saving various things
+  (pressures, flow rates, time)
+- Doesn't work with serialization - just appends to whatever it finds
+- Aspect uses text files for this? Maybe we should collaborate
+** Reporting errors effectively
+People have added a lot of different error detecting and handling systems to C
+and C++ over the last 50 years:
+- =SIGSEGV=, =SIGIL=, etc.
+- floating-point exceptions
+- =errno=
+- =assert()= and =NDEBUG=
+- =abort()=
+- =throw()=
+- =_FORTIFY_SOURCE= for GNU
+- =_GLIBCXX_ASSERT= and =_GLIBCXX_DEBUG= for GNU
+- =MPI_Abort()=
+
+Our job: try to hide as much complexity as we can behind the =Assert()= macro
+and coordinate with =MPI_Abort()= (from =aspect/source/main.cc=):
+#+BEGIN_SRC
+  try
+    {
+      run_simulator<3>([...]);
+    }
+  catch (ExceptionBase &exc)
+    {
+      MPI_Abort(MPI_COMM_WORLD, 1);
+    }
+#+END_SRC
+** Hallucinated macros
+#+BEGIN_SRC
+      std::array<Tensor<1, spacedim>, 2> rotated_fibers{{fiber_f, fiber_f}};
+#ifdef DEBUG_CHECK_ASSERTIONS
+      Assert(std::abs(fiber_f.norm() - 1.0) < 1e-6, ExcFiberNotNormalized());
+      Assert(std::abs(fiber_s.norm() - 1.0) < 1e-6, ExcFiberNotNormalized());
+      auto inner_product = fiber_f * fiber_s;
+#endif
+#+END_SRC
+* General Principles taken from Lean
+** Overview
+#+BEGIN_QUOTE
+Find it; Fix it!
+#+END_QUOTE
+- Taiichi Ohno
+
+We can get a new perspective on how all this works (or doesn't) by using
+strategies from industry. I'm looking at the Toyota Production System (TPS),
+also called 'Lean'
+** Muda (無駄) (non-value-added work, uselessness)
+- Students need to get degrees and leave
+- We need to ship software and write papers
+
+Other things are either necessary (e.g., grants, optimize as much as we can) or
+not necessary (eliminate)
+*** Non-value-added work
+- Compiling code (fixes: ccache, CI, better hardware, not using =-O3
+  -march=native=). How much of our lives have we wasted watching cmake do its
+  thing?
+- Debugging (how do we catch bugs faster?)
+- Managing dependencies, upgrades, system administration
+- Administration (tagging stuff on GitHub, upgrading the CI)
+- Typing too slowly or inaccurately (I am going to start requiring students to
+  do 60 WPM this fall)
+*** The basics
+#+BEGIN_QUOTE
+Re-anything is basically a "hidden factory" at every organization. Re-work,
+re-do, re-check, re-draw, re-test, re-paint, etc. Dollars are flowing out the
+back door of your plant every day these re's stay hidden.
+#+END_QUOTE
+- Steve Hoeft
+
+Students are on-the-job trainees. They are going to make a lot of mistakes and
+do things wrong if we don't tell them otherwise. If they don't fix it later then
+we either live with the consequences (tech debt) or fix it ourselves (rewrites,
+refactors).
+
+- =clang-format= is essentially (for, at a minimum, my sanity)
+- =-Wall -Werror= (a student added =CI sadness :crying cat face:= as a label to
+  Cardinal)
+*** How do I name things?
+Students don't know about Koenig lookup and other hard C++ rules
+- Have a style guide (no Greek names, avoid =bndry= and other shorthand)
+- Prefix member variables with m_: totally unambiguous
+- O(1) functions which don't communicate are typically named =get_*()=
+- I wish the type system could enforce 'this is an accessor function' (maybe in
+  C++32)
+*** What goes where?
+Cardinal has a clearly defined architecture:
+- actual computations occur within utility functions
+- classes are set up with RAII (no staggered initialization)
+
+Since C++ doesn't have garbage collection we tend to write it in a hierarchical
+manner:
+- object A requires objects B, C, and D
+- objects B and C require object E
+- A little graph problem: set up E, then B and C, then A, which assumes
+  responsibility for all of these things (=std::unique_ptr= or =std::move=)
+
+This is mirrored in the input files, which are really nested object definitions.
+** Mura (斑) (patches, unevenness, non-uniformity)
+#+BEGIN_QUOTE
+Where there is no Standard there can be no Kaizen.
+#+END_QUOTE
+- Taiichi Ohno
+
+For scientific software: I define this as
+1. the amount of time between error creation and error detection (should be zero)
+2. the amount of time it takes to merge new code (should be minimized)
+
+Some resulting design principles:
+- design by contract: ctors validate inputs and throw exceptions.
+- note that I said =throw=: we should support most error detection in optimized
+  mode (in practice that's what we run)
+- Encode assumptions in code. Major cardinal bug: some code assumed fibers were
+  orthogonal (not true in a new input file - Laryssa and I wasted a lot of time
+  here)
+- catch errors as early as possible
+  - did someone use multiple copies of boost, petsc, HDF5? Try to detect version
+    number differences at compile time
+  - CI has optimizations turned on (we don't need debugging support) but also
+    maximum assertions
+  - Future work: docker containers with full sanitizer support enabled
+  - Future work: better support optimized + assertions in deal.II (it requires
+    some internal knowledge to do correctly right now)
+
+Do students have to wait a long time for feedback?
+How do we get feedback to people who write code? Do they have to wait for weeks?
+- Put some trust in our coworkers to do things correctly when we aren't around
+- Clear expectations on code (don't nitpick forever, agree on a written
+  standard) to minimize back-and-forth
+
+Some automated systems:
+- =-Wall -Werror=
+- run the full test suite on the CI
+- can we automate the PR checklist?
+** Muri (無理) (unreasonable, overburdening, beyond one's power, excessiveness)
+#+BEGIN_QUOTE
+Put a good person in a bad system and the bad system wins, no contest.
+#+END_QUOTE
+- W. Edwards Deming
+
+Like the 85% rule: students cannot do some things. We have to assign them tasks
+appropriate for their skill levels.
+
+All too common in academia to throw a student at a problem and check back later:
+pretty extreme waste of their time
+
+Big problems for students:
+- MPI
