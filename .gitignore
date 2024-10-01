@@ -13,3 +13,5 @@
 */*.pdf
 */*.fdb_latexmk
 */*.fls
+*/Figures/*pdf
+**/.DS_Store
