@@ -204,6 +204,26 @@ cross/.default={2.5pt}}
 \section{Overview}
 \begin{frame}
     \frametitle{Overview}
+    {\large About Me}
+    \begin{itemize}
+    \item[$\blacksquare$] PhD in applied mathematics, 2015
+    \item[$\blacksquare$] postdoc at RPI, 2015 - 2018
+    \item[$\blacksquare$] postdoc at UNC, 2018 - 2023
+    \item[$\blacksquare$] research scientist at UNC, 2023 - present
+    \end{itemize}
+
+    \vfill
+
+    {\large Why?}
+    \begin{itemize}
+    \item[$\blacksquare$] Help students on their journeys in scientific software
+    \item[$\blacksquare$] Contribute to the greater applied mathematics community
+      by maintaining software, contributing patches to upstream projects
+    \item[$\blacksquare$] Solve new and interesting problems with cutting-edge tools
+    \end{itemize}
+
+    \vfill
+
     {\large Topics}
     \begin{itemize}
     \item[$\blacksquare$] deal.II
@@ -217,16 +237,18 @@ cross/.default={2.5pt}}
     \frametitle{deal.II: Overview}
     \begin{figure}
         \centering
-        %% TODO relevant picture
-        % \includegraphics[width=4in]{publications.png}
+        \includegraphics[width=1.5in]{step-32.3d-sphere.partition.cropped.png}
     \end{figure}
     \begin{itemize}
-        \item[$\blacksquare$] Large C++ library implementing adaptive finite elements
+        \item[$\blacksquare$] Large C++ library implementing the adaptive finite element method
         \item[$\blacksquare$] Extraordinarily well-documented with an active 
                              community, classes, videos, examples, etc.
-        \item[$\blacksquare$] Scalable to largest machines today (heterogeneous compute is WIP)
+        \item[$\blacksquare$] Scalable to largest machines today (in use at ORNL
+          and LANL, hetereogeneous compute is WIP)
         \item[$\blacksquare$] Successfully used by students on laptops to solve dissertation-level problems
-        \item[$\blacksquare$] Does not reinvent the wheel: relies on MPI, PETSc, Trilinos, p4est, and many others
+        \item[$\blacksquare$] Successful industry applications (Siemens, Italian
+          shipbuilding, Canadian lumber industry)
+        \item[$\blacksquare$] Does not reinvent the wheel: uses Kokkos, MPI, PETSc, Trilinos, p4est
     \end{itemize}
 \end{frame}
 
@@ -245,29 +267,33 @@ cross/.default={2.5pt}}
 \end{frame}
 
 \begin{frame}
-    \frametitle{deal.II: Showcase: plate tectonics}
+    \frametitle{deal.II Showcase: plate tectonics}
     \begin{figure}
         \centering
-        %% TODO relevant picture
-        %% \includegraphics[width=4in]{publications.png}
+        \includegraphics[width=2in]{aspect.png}
     \end{figure}
     \begin{itemize}
         \item[$\blacksquare$] ASPECT: solve Stokes system at extreme scale (ten trillion DoFs) on Frontera (Gassmoeller et al)
-        \item[$\blacksquare$] Answer fundamental rheological questions, planetary formation, plate techtonics
-        \item[$\blacksquare$] Matrix-free geometric multigrid, scalable linear solvers and preconditioners
+        \item[$\blacksquare$] Picture: \emph{Changes in core-mantle boundary heat ﬂux
+          patterns throughout the supercontinent cycle}, Dannberg et al: how does heat flux inside the earth impact our magnetic field?
+        \item[$\blacksquare$] Matrix-free geometric multigrid, adaptive FEM,
+          scalable linear solvers and preconditioners
     \end{itemize}
 \end{frame}
 
 \begin{frame}
-    \frametitle{deal.II: Showcase: hypersonic flows}
+    \frametitle{deal.II Showcase: hypersonic flows}
     \begin{figure}
         \centering
-        %% TODO relevant picture
-        %% \includegraphics[width=4in]{publications.png}
+        \includegraphics[width=2in]{ryujin.png}
     \end{figure}
     \begin{itemize}
-        \item[$\blacksquare$] ryujin: graph viscosity methods for hyperbolic conservation laws (Maier et al)
-        \item[$\blacksquare$] Model 
+        \item[$\blacksquare$] ryujin: convex limiting, graph viscosity methods
+          (Guermond and Popov) for hyperbolic conservation laws (Maier et al)
+        \item[$\blacksquare$] Picture: Compressible Euler equation with
+          Jones-Wilkins-Lee equation of state (Maier et al)
+        \item[$\blacksquare$] Not just for EOS-based hypersonic flows: also used
+          to model flooding in Texas with shallow-water equations
     \end{itemize}
 \end{frame}
 
@@ -276,30 +302,43 @@ cross/.default={2.5pt}}
     \frametitle{IBAMR: Overview}
     \begin{figure}
         \centering
-        %% TODO relevant picture
-        % \includegraphics[width=4in]{publications.png}
+        \includegraphics[width=2in]{cardiac.png}
     \end{figure}
     \begin{itemize}
         \item[$\blacksquare$] Large C++ library with both finite differences (FDM) and finite elements (FEM)
         \item[$\blacksquare$] Scalable 2d and 3d implementations of common IB methods
         \item[$\blacksquare$] Major project, lead by Boyce Griffith here at UNC, to solve hard FSI problems,
              complex fluids, multiphase flows (Bhalla et al at SDSU)
-        \item[$\blacksquare$] I have been a comaintainer since 2018
+        \item[$\blacksquare$] I have been a co-maintainer since 2018
     \end{itemize}
 \end{frame}
 
 \begin{frame}
-    \frametitle{IBAMR: Some Applications}
+    \frametitle{IBAMR Showcase: Numerical Wave Tank}
     \begin{figure}
         \centering
-        %% TODO relevant picture
-        % \includegraphics[width=4in]{publications.png}
+        \includegraphics[width=2in]{wavetank.png}
     \end{figure}
     \begin{itemize}
-        \item[$\blacksquare$] Large C++ library with both finite differences (FDM) and finite elements (FEM)
-        \item[$\blacksquare$] Scalable 2d and 3d implementations of common IB methods
-        \item[$\blacksquare$] Major project, lead by Boyce Griffith here at UNC, to solve hard FSI problems,
-             complex fluids, multiphase flows (Bhalla et al at SDSU)
+        \item[$\blacksquare$] By the group at SDSU lead by Bhalla
+        \item[$\blacksquare$] Picture: \emph{A model predictive control (MPC)-integrated
+        multiphase immersed boundary (IB) framework for simulating wave energy
+        converters (WECs)}, Khedkar et al
+        \item[$\blacksquare$] Model solids, liquids, and gasses efficiently to solve a real problem
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{IBAMR Showcase: Transarterial Valve Replacement}
+    \begin{figure}
+        \centering
+        \includegraphics[width=3in]{tavr.png}
+    \end{figure}
+    \begin{itemize}
+        \item[$\blacksquare$] What happens when we replace someone's tricuspid valve?
+        \item[$\blacksquare$] Picture: \emph{Patient–Speciﬁc Immersed Finite Element–Difference Model
+of Transcatheter Aortic Valve Replacement}, Brown et al: stent and valve and von Mises stresses
+        \item[$\blacksquare$] Help surgeons understand how these devices work with detailed simulations
     \end{itemize}
 \end{frame}
 
@@ -308,16 +347,34 @@ cross/.default={2.5pt}}
     \frametitle{Cardinal: IBAMR plus deal.II}
     \begin{figure}
         \centering
-        %% TODO relevant picture
-        % \includegraphics[width=4in]{publications.png}
+        \includegraphics[width=1.5in]{metermesh.png}
     \end{figure}
     \begin{itemize}
-        \item[$\blacksquare$] In-progress (unification of other projects)
-        \item[$\blacksquare$] S-tier heart model (we have realistic valve dynamics!)
+        \item[$\blacksquare$] Unified interface to both fluid-structure
+            interaction (FSI) and electrophysiology (EP) models
+        \item[$\blacksquare$] Picture: codim 1 meter mesh measuring flow through
+            a tricuspid valve
+        \item[$\blacksquare$] Detailed models (HGO, O'Hara-Rudy) practitioners care about
+        \item[$\blacksquare$] Group here with Wells, Abdala, Davey, Griffith, and others
         \item[$\blacksquare$] Builds on deal.II's scalable FE infrastructure and 
             IBAMR's IB and incompressible Navier-Stokes (INS) solvers
     \end{itemize}
 \end{frame}
 
+\begin{frame}
+    \frametitle{Cardinal: IBAMR plus deal.II}
+    \begin{figure}
+        \centering
+        \includegraphics[width=2in]{mitral.png}
+    \end{figure}
+    \begin{itemize}
+        \item[$\blacksquare$] Picture: flow around mitral valve and chordae
+        \item[$\blacksquare$] Project 1: fully distributed data structures for IB (Wells)
+        \item[$\blacksquare$] Project 2: better patch-based load balancers (Davey, Wells)
+        \item[$\blacksquare$] Project 3: right heart model (Davey, collaboration with UC Irvine)
+        \item[$\blacksquare$] Project 4: fully coupled EP-FSI (Abdala)
+        \item[$\blacksquare$] Project 5: distributed Lagrange multipliers (TBA)
+    \end{itemize}
+\end{frame}
 
 \end{document}
