@@ -1,7 +1,7 @@
 \documentclass[8pt]{beamer}
 
-\usetheme{Copenhagen}
-\usecolortheme{beaver}
+\usetheme{Darmstadt}
+\usecolortheme{orchid}
 \usepackage[small,center]{caption}
 \usepackage{times}
 \usefonttheme{structurebold}
@@ -77,6 +77,15 @@ cross/.default={2.5pt}}
 
 \section{Introduction to Cardinal}
 \begin{frame}
+  \frametitle{Goals of this talk}
+  \begin{itemize}
+    \item Talk about what worked and didn't work in writing a big new deal.II app (40k SLOC)
+    \item Focused on new deal.II users (everyone here should learn something)
+    \item Please ask questions, argue with me, etc: I've succeeded if I run out of time, not slides
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
     \frametitle{Governing Equations}
     Uses the immersed-boundary finite element / finite difference method (IFED) (Boffi and Heltai)
     \begin{itemize}
@@ -124,12 +133,29 @@ cross/.default={2.5pt}}
 \end{frame}
 
 \begin{frame}
+    \frametitle{Explicit Mechanics} The implicit IB method is WIP for us. We
+    do everything explicitly.
+
+    \begin{itemize}
+      \item Disadvantage of IB method: keeping structures in-place is hard
+      \item Body forces (volumetric penalties, spring forces) (\texttt{cardinal::ForceContribution})
+      \item Stresses (first Piola-Kirchoff: $\PPs(\Xb,t)$ from the equations
+        slide) (also \texttt{cardinal::ForceContribution})
+      \item Active strain models (don't use $\FF(\Xb,t)$ directly: `fix' it to
+        only permit deformations in specified directions) (\texttt{cardinal::ActiveStrain})
+    \end{itemize}
+
+    \texttt{dealii::FEValues} is nice, we have \texttt{cardinal::MechanicsValues} to compute
+    invariants, strains, etc. (and prevent users from calling \texttt{slowpow})
+\end{frame}
+
+\begin{frame}
     \frametitle{Goals}
     %%% TODO: picture!
     What is this project all about? Haven't people already done everything with the IB method?
     \begin{itemize}
       \item Immersed methods (not cut cells), neutral buoyancy. IFED now, IIM soon.
-      \item Modern fiber-reinforced material models.
+      \item Modern fiber-reinforced material models (e.g., Holzapfel-Gasser-Ogden).
       \item All features are available through input files.
       \item Parallel (FEBio has more features but will probably never support MPI).
       \item Students can do interesting things with it and \emph{not} write 5000 line monoliths
@@ -137,23 +163,29 @@ cross/.default={2.5pt}}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Brief History}
+    \frametitle{Brief History of Cardinal}
     How did we get here?
     \begin{itemize}
-      \item 2018: four-chambered-heart. Realistic cardiac dynamics with libMesh!
+      \item 2018: four-chambered-heart. Realistic valve dynamics with libMesh!
       \item 2020: deal.II with simplices is ``not impossible'' (what did we write on the wiki?)
       \item 2021: four-chambered-heart, IBAMR, deal.II (fiddle)
-      \item 2022: I write another libMesh-based paper
+      \item 2022: I write another libMesh-based paper on nodal interaction
       \item 2023: Heart model (Davey) plus IFED (me) plus electrocardiology (Abdala, Rossi)
       \item 2024: Realistic valve dynamics with deal.II
     \end{itemize}
 \end{frame}
 
+
 \section{Rest of the talk}
 \begin{frame}
   \frametitle{What is this talk about?}
+
+  \begin{center}
+    \includegraphics[width=0.4\linewidth]{mitral-2.png}
+  \end{center}
+
   \begin{itemize}
-    \item All the problems Laryssa and I ran into
+    \item Problems Abdala and I ran into
     \item Interesting Cardinal features
     \item Ideas for improving other deal.II apps
   \end{itemize}
@@ -161,7 +193,7 @@ cross/.default={2.5pt}}
   \vfill
 
   \begin{center}
-    Framing: eliminating the three kinds of waste (muda, mura, muri).
+    Framing: eliminating the three kinds of waste (muri, muda, mura).
   \end{center}
 \end{frame}
 
@@ -175,12 +207,15 @@ cross/.default={2.5pt}}
       \item Formal training in mathematics, computer science
     \end{itemize}
 
+    \vfill
+
     Our jobs are...
     \begin{itemize}
       \item dev ops (who is going to fix the CI?)
       \item write proposals
       \item teach classes
     \end{itemize}
+    We can do anything, but we can't do everything.
 \end{frame}
 
 \begin{frame}
@@ -205,6 +240,162 @@ cross/.default={2.5pt}}
     \end{itemize}
 \end{frame}
 
+\section{Muri}
+\begin{frame}
+  \frametitle{Muri - Unreasonable, Over-burdening}
+  Rule-of-thumb: students should succeed 85\% of the time, fail 15\% of the time
+
+  Which tasks do students struggle with the most?
+  \begin{itemize}
+    \item C++
+    \item Architecture (we should be the vanguard and rearguard)
+    \item Installing things (students shouldn't spend days recompiling stuff)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Muri - Unreasonable, Over-burdening}
+  C++ is hard. How can we make it easier for students?
+  \begin{itemize}
+    \item \texttt{clang-format} (thanks Matthias!)
+    \item Great documentation (deal.II's greatest strength)
+    \item \texttt{-Wall -Wpedantic -Werror -DDEBUG} on the CI
+    \item Constant-time accessors are named \texttt{get\_*()} (guaranteed to not
+      use MPI, can be called in hot loops, etc)
+    \item Most functions are named \texttt{compute\_*()}
+    \item Don't worry about ADL et al: prefix member variables with \texttt{m\_}
+    \item No Greek or shorthand, e.g., \texttt{bndry}
+    \item I fight hard to keep CGS units everywhere
+  \end{itemize}
+
+  \vfill
+
+  Abdala and I wrote the style guide together - we should keep students involved
+  in writing standards!
+\end{frame}
+
+\begin{frame}
+  \frametitle{Muri - Unreasonable, Over-burdening}
+  C++ is hard. How can we make it easier for students?
+
+  \begin{itemize}
+    \item ``don't learn the tricks of the trade, learn the trade''
+    \item ChatGPT frequently solves problems that don't need to be solved
+    \item TODO: compile more good resources (keynotes, lecture series, books)
+      for students to learn from instead of whatever ChatGPT recommends
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Muri - Unreasonable, Over-burdening}
+
+  \begin{center}
+    \includegraphics[width=0.4\linewidth]{tricuspid-1.png}
+  \end{center}
+
+  Provide good architecture so
+  students don't have to solve every problem, just their problem.
+
+  \begin{itemize}
+    \item I spent a lot of time reading Aspect's source code (thanks!)
+    \item Make it possible for students to get the job done by inheriting from a
+      class, using a plugin, etc. instead of patching some huge class
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Overburdening: Use Good Architecture}
+
+    How do we prevent students from writing 5000-line monoliths? How do we
+    sustainably grow deal.II? What is deal.II?
+
+    deal.II architecture:
+    \begin{itemize}
+      \item The very nice dependency graph on the front page of the manual
+      \item \texttt{dealii::SmartPointer} and \texttt{dealii::Subscriptor}: one-to-many
+      \item No global variables!
+      \item All time-dependent state is in vectors, which are loosely coupled
+        via \texttt{dealii::Utilities::MPI::Partitioner}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Overburdening: Use Good Architecture}
+
+    Cardinal architecture:
+    \begin{itemize}
+      \item `When in Rome': inherit several IBAMR-isms (SAMRAI's input files,
+        restart singleton class)
+      \item RAII, no staged initialization (not obvious to students!)
+      \item Who is responsible? \texttt{std::move()} when we can,
+        \texttt{subscribe()} if we must, \texttt{std::shared\_ptr} if absolutely
+        necessary
+      \item Like deal.II: most of the work happens in utility functions, classes
+        (except FE vectors) are immutable modulo regridding
+      \item Goal: everything accessible through the input file. Custom code via
+        plugins
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Overburdening: Use Good Architecture}
+
+    Cardinal architecture:
+    \begin{itemize}
+      \item Like Aspect: \texttt{main.cc} sets up the \texttt{cardinal::Simulator}
+        God-object (unavoidable to write a reasonable time-stepping loop),
+        catches exceptions
+      \item Unlike Aspect: no \texttt{dlopen()} for plugins - they are
+        explicitly passed to \texttt{cardinal::Simulator} (not sure which is better)
+      \item Unlike Aspect: no \texttt{cardinal::SimulatorAccess} yet
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Overburdening: Use Good Architecture}
+
+    Cardinal architecture: \texttt{cardinal::Part<dim, spacedim>}
+    \begin{itemize}
+      \item solely responsible for the position, velocity, and material models
+        (forces, active strains) of one structure
+      \item ctor: \texttt{std::vector<std::unique\_ptr<cardinal::ForceContribution<dim>>},
+        \texttt{std::vector<std::unique\_ptr<cardinal::ActiveStrain<dim>>},
+      \item uses RAII
+      \item only place where we use \texttt{set\_*()} functions!
+      \item \texttt{SmartPointer<const cardinal::Part<dim>>} grants access
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Overburdening: Use Good Architecture}
+
+    Cardinal architecture: \texttt{cardinal::fsi::IFEDMethod<dim>}
+    \begin{itemize}
+      \item inherits from \texttt{IBAMR::IBStrategy}
+      \item `handed-off' to \texttt{IBAMR::IBExplicitHierarchyIntegrator}
+      \item ctor: \texttt{std::vector<cardinal::Part<dim>>} (unique ownership of
+        \texttt{cardinal::Part}s)
+      \item implementation: about 1500 LOC, all loops over cells are in utility functions
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Overburdening: simplify compilation}
+  Students spend a \emph{shocking} amount of time recompiling stuff! Everything
+  that can go wrong will frequently go wrong.
+
+  \begin{itemize}
+    \item Multiple copies of PETSc
+    \item Conflicts between system libraries and user libraries
+    \item Don't know what package managers are
+  \end{itemize}
+
+  Solution: autoibamr (forked from candi). Minimal configuration options
+  (known-good versions, only three build types) means it is more likely to
+  succeed. We should continue investing in anything that makes this process
+  easier.
+\end{frame}
+
 \section{Muda}
 \begin{frame}
   \frametitle{Muda - non-value-added work}
@@ -213,7 +404,7 @@ cross/.default={2.5pt}}
   \end{aquote}
   What do we actually do that is of value?
 
-  \pause
+  \vfill
 
   \begin{itemize}
     \item Graduate students
@@ -221,16 +412,18 @@ cross/.default={2.5pt}}
     \item Ship software
   \end{itemize}
 
+  \vfill
+
   Everything else is either necessary (e.g., write grants) or unnecessary
   (should be removed).
 \end{frame}
 
 \begin{frame}
-  \frametitle{non-value-added work}
+  \frametitle{non-value-added work: observations}
 
-  Some non-value-added work. If we watch our students - what are they doing?
+  What are our students actually doing?
   \begin{itemize}
-    \item Compiling code (\emph{fixes}: ccache, CI, better hardware, use \texttt{-O1})
+    \item Compiling code (\emph{fixes}: ccache, CI, better hardware, use \texttt{-O1} or \texttt{-Os})
     \item Debugging (\emph{don't write bugs!})
     \item Running everything in debug mode (too slow!)
     \item Managing dependencies, upgrades, system administration
@@ -246,13 +439,138 @@ cross/.default={2.5pt}}
     \item \texttt{make} to \texttt{ninja} (what is \texttt{-j4}?)
     \item \texttt{-O3} to \texttt{-O1} (multiple builds?)
     \item \texttt{ccache} (what are object files?)
-    \item Make the CI fail fast, finish in 5 minutes
-    \item Trickery to make \texttt{-DDEBUG} work with \texttt{-O1} and not \texttt{-g}
+    \item Interesting linker developments (\texttt{ld}, \texttt{gold}, \texttt{mold})
+    \item Make the CI fail fast
+    \item Trickery to make \texttt{-DDEBUG} work with \texttt{-O1} in release mode
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{non-value-added work: munging text files}
+
+  \begin{center}
+    \includegraphics[width=0.6\linewidth]{aortic-valve-flux.png}
+  \end{center}
+
+  four-chambered-heart: Need to log something? Open a text file!
+  \begin{itemize}
+    \item Produces wrong output with restarts!
+    \item What went where and why? How do we pick file names?
+    \item Are we using mmHg today? Are you \emph{sure} it is mmHg?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{non-value-added work: munging text files}
+
+  We have a single class now for all output:
+  \texttt{cardinal::StatisticalOutput}
+  \begin{verbatim}
+template <int dim>
+struct Statistics
+{
+  std::string                                            group;
+  std::map<std::string, std::pair<double, Unit>>         scalars;
+  std::map<std::string, std::pair<Tensor<1, dim>, Unit>> vectors;
+};
+  \end{verbatim}
+
+  \begin{itemize}
+    \item Quite different from the Aspect version - uses 100\% HDF5 (structured
+      output, stores units as metadata, etc), no \texttt{TableHandler}
+    \item Works correctly with restart files
+    \item IBAMR-ism: can load the HDF5 file as an input file
+    \item Future work: callbacks, user-defined statistics via plugins
   \end{itemize}
 \end{frame}
 
 \section{Mura}
+\begin{frame}
+  \frametitle{Mura - patches, unevenness, non-uniformity}
+  \begin{aquote}{Taiichi Ohno}
+    Where there is no Standard there can be no Kaizen.
+  \end{aquote}
 
-\section{Muri}
+  \vfill
+
+  \begin{itemize}
+    \item Georgetown's Camry plant: all jobs equally physically taxing, rotate to
+      avoid RSI
+    \item Bowling Green's Corvette plant: younger staff get harder jobs, more
+      senior staff pick less taxing jobs
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Unevenness: definitions in scientific computing}
+
+  What does this mean in scientific software?
+
+  \vfill
+
+  \begin{itemize}
+    \item Try to level out the workload (e.g., having the CI automatically file issues)
+    \item Minimize time between error creation and error detection
+    \item Minimize time to merge new code
+    \item Train students to break up work
+    \item I refuse to review patches with more than 1k lines of source code changed
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Unevenness: case example}
+
+  \begin{verbatim}
+for (unsigned int i = 0; m_ionic_parts.size(); i++)
+    m_ionic_parts[i].save(archive, version);
+  \end{verbatim}
+
+  What went wrong here? Let's do 5-why!
+
+  \vfill
+
+  {\small
+  \begin{verbatim}
+An error occurred in line <1050> of file <[...]/source/base/utilities.cc>
+ in function
+ void [...]::posix_memalign([...])
+The violated condition was:
+ ierr == 0
+Additional information:
+ Your program tried to allocate some memory but this allocation failed.
+ Typically, this either means that you simply do not have enough memory
+ in your system, or that you are (erroneously) trying to allocate a
+ chunk of memory that is simply beyond all reasonable size, for example
+ because the size of the object has been computed incorrectly.
+
+ In the current case, the request was for 18410715276690587648 bytes.
+  \end{verbatim}
+  }
+\end{frame}
+
+\begin{frame}
+  \frametitle{Unevenness: case example}
+
+  My program crashed in debug mode.
+  \begin{enumerate}
+    \item Why? My vector tries to allocate 16 exabytes of memory.
+    \item Why? Clearly (to an expert) reading uninitialized memory.
+    \item Why? Walked off the end of an array.
+    \item Why? No range checks.
+    \item Why? We don't have a way to turn on range checks automatically
+  \end{enumerate}
+
+  \vfill
+
+  Now what?
+
+  \begin{itemize}
+    \item Starter fix: compile everything with
+      \texttt{-D\_GLIBCXX\_ASSERTIONS} (easy)
+    \item Better fix: set up CI to use \texttt{-D\_GLIBCXX\_DEBUG\_PEDANTIC},
+      sanitizers (harder)
+  \end{itemize}
+\end{frame}
+
 
 \end{document}
