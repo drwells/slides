@@ -1,0 +1,673 @@
+\documentclass[8pt]{beamer}
+
+\usetheme{Darmstadt}
+\usecolortheme{dove}
+\usepackage[small,center]{caption}
+\usepackage{times}
+\usefonttheme{structurebold}
+\usepackage[english]{babel}
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps}
+\usepackage{amsmath,amssymb}
+\usepackage{amsxtra}
+
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{shapes.misc}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Define colors
+\definecolor{commentcolor}{rgb}{0.13, 0.55, 0.13}  % Green for comments
+\definecolor{keywordcolor}{rgb}{0.0, 0.0, 0.8}     % Blue for keywords
+\definecolor{stringcolor}{rgb}{0.8, 0.0, 0.0}      % Red for strings
+\definecolor{constantcolor}{rgb}{0.5, 0.0, 0.5} % Purple for constants
+
+% Set default style for C
+\lstset{
+    language=C,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{keywordcolor}\bfseries,
+    commentstyle=\color{commentcolor},
+    stringstyle=\color{stringcolor},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    breaklines=true,
+    breakatwhitespace=true,
+    frame=single,
+    columns=fullflexible,
+    captionpos=b,
+    escapechar=|,
+    inputencoding=utf8,
+    extendedchars=true
+}
+
+\newcommand{\leftd}[1]{{\color{red} \bar{#1}}}
+\newcommand{\interface}[2]{{\color{blue}{#1}_I(#2)}}
+\newcommand{\leftdd}[2]{{\color{red} \bar{#1}(\bar{#2})}}
+\newcommand{\leftFourier}[1]{{\color{red} \hat{#1}}}
+\newcommand{\leftFourierTwo}[2]{{\color{red} \hat{#1}(\hat{#2})}}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\divergence}{\mathrm{div}}
+
+\newcommand{\I}{I}
+
+\newcommand{\vst}{\vskip 0.2cm\noindent}
+\newcommand{\vso}{\vskip 0.1cm\noindent}
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\matl}{M{\scriptsize ATLAB }}
+\newcommand{\Div}[1]{\nabla\cdot #1}
+\newcommand{\DIV}[1]{\nabla_{\mathbf{X}} \cdot #1}
+\newcommand{\kk}{\mathcal{K}}
+
+\newcommand{\etal}{\emph{et al}.}
+
+\newcommand{\BB}{\mathbb{B}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\MM}{\mathbb{M}}
+\newcommand{\FFb}{\overline{\FF}}
+
+\newcommand{\ub}{\boldsymbol{u}}
+\newcommand{\ubf}{\boldsymbol{u}^{\text{f}}}
+\newcommand{\ubs}{\boldsymbol{u}^{\text{s}}}
+\newcommand{\vb}{\boldsymbol{v}}
+\newcommand{\wb}{\boldsymbol{w}}
+\newcommand{\yb}{\boldsymbol{y}}
+\newcommand{\Chib}{\boldsymbol{\chi}}
+\newcommand{\cb}{\boldsymbol{\chi}}
+\newcommand{\xb}{\boldsymbol{x}}
+\newcommand{\Xb}{\boldsymbol{X}}
+\newcommand{\fb}{\boldsymbol{f}}
+\newcommand{\Fb}{\boldsymbol{F}}
+\newcommand{\Ub}{\boldsymbol{U}}
+\newcommand{\UbVecIB}{\vec{\Ub}\vphantom{\Ub}^{\text{IB}}}
+\newcommand{\Vb}{\boldsymbol{V}}
+\newcommand{\Lb}{\boldsymbol{L}}
+\newcommand{\LbVecIB}{\vec{\Lb}\vphantom{\Lb}^{\text{IB}}}
+\newcommand{\Nb}{\boldsymbol{N}}
+\newcommand{\nb}{\boldsymbol{n}}
+\newcommand{\hb}{\boldsymbol{h}}
+\newcommand{\ab}{\boldsymbol{a}}
+\newcommand{\Ab}{\boldsymbol{A}}
+\newcommand{\pb}{\boldsymbol{\phi}}
+
+\newcommand{\cauchy}{\bbsigma}
+\newcommand{\cauchyf}{\bbsigma^{\text{f}}}
+\newcommand{\cauchyv}{\bbsigma^{\text{v}}}
+\newcommand{\cauchys}{\bbsigma^{\text{e}}}
+\newcommand{\cauchysolid}{\bbsigma^{\text{s}}}
+\newcommand{\ztensor}{\mathbb{0}}
+\newcommand{\pstab}{\pi_{\text{stab}}}
+\newcommand{\pf}{\pi^{\text{f}}}
+\newcommand{\ps}{\pi^{\text{s}}}
+\newcommand{\pphys}{p}
+\newcommand{\peul}{\pi}
+\newcommand{\mus}{\mu^{\text{s}}}
+\newcommand{\muf}{\mu^{\text{f}}}
+\newcommand{\rhos}{\rho^{\text{s}}}
+\newcommand{\rhof}{\rho^{\text{f}}}
+\newcommand{\cbs}{\Chib^{\text{s}}}
+\newcommand{\ds}{\boldsymbol{d}^{\text{s}}}
+
+\newcommand{\PPs}{\PP^{\text{e}}}
+\newcommand{\PPsm}{\bar{\PP}^{\text{e}}}
+
+\newcommand{\soliddom}{{\Omega^{\text{s}}_t}}
+\newcommand{\soliddomO}{{\Omega^{\text{s}}_0}}
+\newcommand{\fluiddom}{\Omega^{\text{f}}_t}
+\newcommand{\fluiddomO}{\Omega^{\text{f}}_0}
+\newcommand{\fsinterface}{\Gamma^{\text{fs}}_t}
+\newcommand{\fsinterfaceO}{\Gamma^{\text{fs}}_0}
+\newcommand{\subsolid}{\omega^{\text{s}}_t}
+\newcommand{\subsolidO}{\omega^{\text{s}}_0}
+
+\newcommand{\Wiso}{W^{\text{iso}}}
+\newcommand{\Wb}{\overline{W}}
+
+\newcommand{\PPb}{\bar{\PP}^\text{e}}
+
+\newcommand{\cNHB}{\bar{\cauchy}_{\text{NH}}}
+\newcommand{\dev}{\text{dev}}
+\newcommand{\DEV}{\text{DEV}}
+\newcommand{\efac}{E_\text{FAC}}
+\newcommand{\mfac}{M_\text{FAC}}
+\newcommand{\tr}{\text{tr}}
+\newcommand{\nus}{\nu_\text{stab}}
+\newcommand{\kappas}{\kappa_\text{stab}}
+%\newcommand{\mus}{\mu_\text{s}}
+%\newcommand{\mut}{\mu_\text{T}}
+\newcommand{\mul}{\mu_\text{L}}
+\newcommand{\Gt}{G_\text{T}}
+\newcommand{\Gl}{G_\text{L}}
+\newcommand{\El}{E_\text{L}}
+
+\newcommand{\vol}{\text{vol}}
+\newcommand{\nvol}{\mathcal{N}}
+\newcommand{\supp}{\text{supp}}
+\newcommand{\mm}{\mathcal{M}}
+\newcommand{\mmd}{\mathcal{M}^{\text{1D}}}
+\newcommand{\xib}{\boldsymbol{\xi}}
+\newcommand{\Pone}{\mathcal{P}^1}
+\newcommand{\Ptwo}{\mathcal{P}^2}
+\newcommand{\Qone}{\mathcal{Q}^1}
+\newcommand{\Qtwo}{\mathcal{Q}^2}
+\newcommand{\Bb}{\boldsymbol{B}}
+\newcommand{\order}{\mathcal{O}}
+
+\newcommand{\tria}{{\ensuremath{\mathcal{T}^h}}}
+\newcommand{\euleriandx}{{\ensuremath{\Delta x}}}
+\newcommand{\lagrangiandx}{{\ensuremath{\Delta X}}}
+
+\newcommand{\dAb}{\, \mathrm{d}\Ab}
+\newcommand{\dXb}{\, \mathrm{d}\Xb}
+
+\newcommand{\dxb}{\, \mathrm{d}\xb}
+
+% fix placement of superscripts on characters with tildes
+\newcommand{\tilden}[2]{\ensuremath{\tilde{#1}\vphantom{#1}^{#2}}}
+
+\newcommand{\xface}{{i, j + \half, k + \half}}
+\newcommand{\yface}{{i + \half, j, k + \half}}
+\newcommand{\zface}{{i + \half, j + \half, k}}
+
+% same with transposes and vecs
+\newcommand{\vecT}[1]{\ensuremath{\vec{#1}\vphantom{#1}^T}}
+% getting the arrow to appear nicely over the 1 is surprisingly tricky
+\newcommand{\vecOneT}{%
+  \ensuremath{%
+    \vec{\vphantom{\boldsymbol{1}}\hphantom{-}}% Put an arrow over a box of about the right shape
+    \llap{\ensuremath{\boldsymbol{1}}}% place the symbol to the left of the current location of the cursor
+    ^T%
+  }}
+
+\newcommand*{\vcenterimage}[1]{\vcenter{\hbox{\includegraphics[width=2in]{#1}}}}
+\newcommand*{\vcenterarrow}{\vcenter{\hbox{$\Longrightarrow$}}}
+
+\DeclareMathOperator{\hyphen}{-}
+
+\definecolor{Carolinablue}{RGB}{75, 156, 211}
+\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
+\definecolor{lightgray}{rgb}{0.83, 0.83, 0.83}
+\setbeamercolor{block title}{bg=lightgray,fg=Carolinablue}
+\setbeamercolor{block body}{bg=white,fg=black}
+\setbeamercovered{dynamic}
+\setbeamercolor*{item}{fg=Carolinablue}
+
+\captionsetup[subfigure]{labelformat=empty}
+\captionsetup[figure]{labelformat=empty}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\begin{document}
+
+% tikz stuff
+\tikzset{cross/.style={cross out, draw=black, minimum size=2*(#1-\pgflinewidth),
+inner sep=0pt, outer sep=0pt},
+%default radius will be 1pt.
+cross/.default={2.5pt}}
+
+
+
+\frame{
+  \title{\Large Cardinal: A Framework for FSI}
+
+\author{{\Large David Wells, Laryssa Abdala, Marshall Davey, Boyce Griffith \\\vspace{0.1in} University of North Carolina}    \\
+\vspace{0.2in} {Cardiovascular Modeling and Simulation Lab}}
+
+\date{November 20, 2025\\{}}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=1.5in]{UNC_logo_542.eps}
+ \end{figure}%
+
+\vspace{-0.2in}
+\titlepage
+}
+
+\section{Overview}
+\begin{frame}
+    \frametitle{Overview}
+    {\large Topics}
+    \begin{itemize}
+    \item[$\blacksquare$] History and Goals
+    \item[$\blacksquare$] Features
+    \item[$\blacksquare$] Future Work
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Thanks!}
+    A bunch of people have contributed to Cardinal. Major authors:
+    \begin{itemize}
+      \item[$\blacksquare$] Laryssa Abdala
+      \item[$\blacksquare$] Simone Rossi
+      \item[$\blacksquare$] Marshall Davey
+    \end{itemize}
+    \vfill
+    Another special thanks for Boyce Griffith and Charles Puelz for their
+    tireless work on the original heart model.
+\end{frame}
+
+\section{History}
+\begin{frame}
+  \frametitle{2018}
+  I arrive at UNC!
+  \begin{itemize}
+    \item[$\blacksquare$] Took me a week to write my first patch (fix some Fortran warnings)
+    \item[$\blacksquare$] Dozens of compatibility fixes (clang, PETSc, libMesh, muParser, Eigen...)
+      or other minor things
+    \item[$\blacksquare$] Major goal: make the heart model fast
+  \end{itemize}
+
+  \vfill
+
+  What were we doing back then?
+  \begin{itemize}
+    \item[$\blacksquare$] Work towards Marshall's thesis and the Langtangen prize: we were
+      running the original heart model (four-chambered-heart) nonstop on dogwood
+      and longleaf
+
+    \item[$\blacksquare$] four-chambered-heart: realistic valve dynamics with IBAMR. Built on
+      IBFEMethod. This project became the original template for Cardinal!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2019}
+  IBAMR:
+  \begin{itemize}
+    \item[$\blacksquare$] IBAMR gets a proper test suite, replacing the one built solely on examples
+    \item[$\blacksquare$] Lots of performance optimizations: the heart model got faster 3\% at a time (better parallel communication, caching more data instead of recomputing it, etc.)
+  \end{itemize}
+  \vfill
+
+  What was going on with the heart model?
+  \begin{itemize}
+    \item[$\blacksquare$] More stress models (e.g., biaxial fung)
+    \item[$\blacksquare$] Growing pains: Fixing a typo like a wrong database name
+      (``EverthingElsePart'' should be ``EverythingElsePart'') requires
+      re-running the heart model on a cluster, which takes at least 10 minutes
+      to initialize and (IIRC) 2-3 GB of RAM per process
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2020}
+  IBAMR and deal.II:
+  \begin{itemize}
+    \item[$\blacksquare$] \texttt{IBTK::SAMRAIGhostDataAccumulator}: spread data into ghost
+      regions and accumulate instead of spreading data from ghost regions into
+      the interiors (we roughly halve the number of elements associated with each
+      patch!)
+    \item[$\blacksquare$] I rewrote all of IBAMR's FE mapping stuff to be 20x faster
+    \item[$\blacksquare$] ``deal.II doesn't support tetrahedra'', Wolfgang, February 2020
+    \item[$\blacksquare$] Peter M\"unch has too much time on his hands and starts work on
+      adding tetrahedra to deal.II and unifying \texttt{hp::DoFHandler} and
+      \texttt{DoFHandler} (worked 12-hour days for months)
+    \item[$\blacksquare$] I reviewed and merged 28 of Peter's patches just in December
+  \end{itemize}
+  \vfill
+
+  What was going on with the heart model?
+  \begin{itemize}
+    \item[$\blacksquare$] TetWild (from the February trip to Seattle - my last pre-pandemic conference)
+    \item[$\blacksquare$] We learn that active strain is the way to go and it is added into each
+      stress function directly (messy!)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2020}
+  IBAMR and deal.II:
+  \begin{itemize}
+    \item[$\blacksquare$] CMake!
+    \item[$\blacksquare$] libMesh got us to the Langtangen prize (don't forget that!)
+      limit
+    \item[$\blacksquare$] libMesh isn't scalable (I don't understand how their distributed mesh
+      class works), takes up too much memory, and is slow
+    \item[$\blacksquare$] Peter's MOOSE competitor was 30x faster and he tried hard to understand
+      why
+    \item[$\blacksquare$] \texttt{IBAMR::IBFEMethod} assumes every \texttt{Elem} is on every
+      processor
+    \item[$\blacksquare$] I draft \texttt{cardinal::fsi::OverlapTriangulation} to overcome most
+      of these issues (still uses \texttt{parallel::shared::Triangulation})
+  \end{itemize}
+  \vfill
+
+  four-chambered-heart stuff:
+  \begin{itemize}
+    \item[$\blacksquare$] Now running several times faster (maybe Marshall or Charles remember
+      more precise numbers)
+    \item[$\blacksquare$] Does exactly one thing: runs the heart model
+    \item[$\blacksquare$] Difficult to debug, can't be used in other models
+    \item[$\blacksquare$] Inherited the performance problems from \texttt{IBAMR::IBFEMethod}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2021}
+  IBAMR stuff:
+  \begin{itemize}
+    \item[$\blacksquare$] We finally get CI on GitHub actions (thanks KitWare!)
+    \item[$\blacksquare$] A lot less maintenance and performance stuff
+    \item[$\blacksquare$] Nodal interaction with Ben Vadala-Roth
+  \end{itemize}
+  \vfill
+
+  proto-Cardinal stuff:
+  \begin{itemize}
+    \item[$\blacksquare$] Get IB working for the first time: \texttt{cardinal::fsi::IFEDMethod}
+      can replace \texttt{IBAMR::IBFEMethod}
+    \item[$\blacksquare$] First results presented for a 2d example at the online deal.II workshop
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What worked and didn't work with the heart model?}
+  Good things:
+  \begin{itemize}
+    \item[$\blacksquare$] One executable, multiple computational experiments
+    \item[$\blacksquare$] Supports lots of stress functions, active stress (2021), fibers
+    \item[$\blacksquare$] Computes flowrates, pressures, etc. from nodesets
+  \end{itemize}
+  \vfill
+
+  Pain points:
+  \begin{itemize}
+    \item[$\blacksquare$] Can't do a bag model, channel flow, etc.
+    \item[$\blacksquare$] Meter output requires a lot of manual intervention
+    \item[$\blacksquare$] Same inherited libMesh problems as before
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2022}
+  Dependencies:
+  \begin{itemize}
+    \item[$\blacksquare$] deal.II simplex orientation is fairly mature
+    \item[$\blacksquare$] We start tracking SAMRAI patches in IBSAMRAI2
+  \end{itemize}
+  \vfill
+
+  fch-deal and fch-ep:
+  \begin{itemize}
+    \item[$\blacksquare$] Independent projects (we haven't finished absorbing fch-ep yet)
+    \item[$\blacksquare$] fch-deal: run \emph{any} FSI app with just input files. Basic architecture of Cardinal's input files (forces, fibers, postprocessing, use \texttt{dealii::GridGenerator}, etc.)
+    \item[$\blacksquare$] fch-ep: port EP stuff to deal.II (we should have coordinated more at
+      this point)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2023}
+  Cardinal starts!
+  \begin{itemize}
+    \item[$\blacksquare$] Combines fch-deal with its dependencies (fiddle)
+    \item[$\blacksquare$] I design \texttt{fsi::ActiveStrain} so that Laryssa can write
+      \texttt{ElectricalActiveDeformationGradient} next year
+  \end{itemize}
+  \vfill
+
+  What have we learned so far?
+  \begin{itemize}
+    \item[$\blacksquare$] \emph{Eliminate extra steps}: all statistical data is in one place
+      and uses CGS (this is still a pain point with electrophysiology)
+    \item[$\blacksquare$] \emph{Testing}: we need to guarantee things work quickly (tests take
+      less than a minute each) and consistently (100\% of tests must pass to merge)
+    \item[$\blacksquare$] \emph{We control the main loop}: necessary to upgrade people's apps
+    \item[$\blacksquare$] \emph{extension mechanisms}: don't copy-paste the whole project, write
+      just the class you need
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2024}
+  We did most of Laryssa's thesis this year!
+  \begin{itemize}
+    \item[$\blacksquare$] Laryssa writes more code than all other students combined
+    \item[$\blacksquare$] Merge fch-ep into Cardinal
+    \item[$\blacksquare$] Unending patches to couple EP and mechanics
+    \item[$\blacksquare$] Cardinal now uses \texttt{parallel::fullydistributed::Triangulation}
+      to finally tame parallel memory usage (don't need every element on every
+      processor)
+  \end{itemize}
+  \vfill
+
+  What didn't work?
+  \begin{itemize}
+    \item[$\blacksquare$] \emph{Bad management of fch-ep}: we had two incompatible input file
+      formats and expectations (still a problem, though we've merged most of it)
+    \item[$\blacksquare$] Need \emph{better tools} for students to catch basic mistakes
+      (\texttt{-D\_GLIBCXX\_ASSERTIONS})
+    \item[$\blacksquare$] Students should \emph{write code or prove theorems}, so they need
+      training in the former to not waste huge amounts of time
+    \item[$\blacksquare$] We need to \emph{upgrade workflows} (``ask Marshall'' doesn't scale)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{2025}
+  A quieter year.
+  \begin{itemize}
+    \item[$\blacksquare$] Lots of IBSAMRAI2 and IBAMR fixes for parallel communication,
+      memory allocation, etc.
+    \item[$\blacksquare$] Many deal.II performance fixes for simplices (\texttt{MappingP1} etc.)
+    \item[$\blacksquare$] I fix a lot of obscure simplex bugs related to element orientations
+  \end{itemize}
+  \vfill
+
+  Cardinal-wise:
+  \begin{itemize}
+    \item[$\blacksquare$] Continue merging fch-ep and Cardinal (still ongoing: things need tests,
+      documentation, minor fixes, etc.)
+    \item[$\blacksquare$] More work on ECGs with Preetam Tanikella
+    \item[$\blacksquare$] Most UGRs do something useful this summer
+  \end{itemize}
+\end{frame}
+
+\section{What does Cardinal Do?}
+\begin{frame}
+  \frametitle{Overview}
+  it was inspired by four-chambered-heart and reimplements most of that project:
+  \begin{itemize}
+    \item[$\blacksquare$] statistical output (no pizza meshes, though)
+    \item[$\blacksquare$] visualization, restarts, etc.
+    \item[$\blacksquare$] parsing ExodusII files (in-progress: output ExodusII and nemesis)
+  \end{itemize}
+
+  and a lot more:
+  \begin{itemize}
+    \item[$\blacksquare$] fully distributed data structures! (except list of patch boxes)
+    \item[$\blacksquare$] Electrophysiology!
+    \item[$\blacksquare$] Same code for EP-FSI, bag models, channel flows, etc.
+    \item[$\blacksquare$] Stuff with Mike Lee (ODU), Arash Kheradvar (UCI), our own things
+      (right heart, EP-FSI, ECG), hopefully more soon
+    \item[$\blacksquare$] Motivates a lot of improvements in SAMRAI, IBAMR, deal.II, sometimes PETSc
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Specifications of stresses}
+  FCH-EP uses 24 such definitions:
+  \lstset{language=c}
+  \begin{lstlisting}
+// anterior mitral valve marginal chordae
+ForceContribution_AMVL_marginal {
+   type                  = "nonlinear_spring"
+   a                     = 1.6181e8
+   a_f                   = 1.678783e9
+   index_f               = 0
+   material_ids          = 107, 109, 112, 117, 118
+   even_order_quadrature = TRUE
+   n_points_1D           = 1
+}
+  \end{lstlisting}
+  \begin{itemize}
+    \item[$\blacksquare$] SAMRAI's input database format is pretty good
+    \item[$\blacksquare$] \texttt{material\_id}s are ExodusII block ids
+    \item[$\blacksquare$] \texttt{n\_points\_1D} is deal.II jargon (number of quadrature points
+      in the equivalent-order 1d rule: this rule is second-order accurate and
+      has four points)
+    \item[$\blacksquare$] \texttt{even\_order\_quadrature} means to use the even-degree
+      Witherden-Vincent rule (fewer points for at least second-order accurate)
+  \end{itemize}
+  \end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Specifications of active strain models}
+  Our main way (from four-chambered-heart) of doing contraction:
+  \begin{lstlisting}
+ActiveStrain_AtriaVentricle_ActivationBump {
+   type                = "electrical"
+   index_f             = 0
+   index_s             = 1
+   index_n             = 2
+
+   material_ids = 1, 2, 3, 4, 20, 300, 301
+   max_amplitude_activation_function   = -0.122
+
+   viscosity                           = 400
+   voltage_coefficient                 = -1.0
+
+   orthotropic_material_ids = 1, 2, 20
+   orthotropic_shortening_f            = VENTRICLE_SHORTENING
+   orthotropic_scaling_n               = 4.0
+
+   transversely_isotropic_shortening_f = ATRIUM_SHORTENING
+   transversely_isotropic_material_ids = 3, 4, 300, 301
+}
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{How do active strains and stresses work together?}
+  We have multiple implementations of active strain (see Marshall's thesis),
+  and multiple stress functions: how do we keep it sorted?
+  \begin{itemize}
+  \item[$\blacksquare$] \texttt{fsi::MechanicsValues} computes the deformation gradient,
+    invariants, etc.
+  \item[$\blacksquare$] That class computes $\mathbb{F}_E = \mathbb{F} \mathbb{F}_A$, which is
+    what the stresses see as ``$\mathbb{F}$''
+  \item[$\blacksquare$] Stresses compute $\mathbb{P}_E(\mathbb{F}_E)$
+    $\mathbb{P} = \det(\mathbb{F}_A) \mathbb{P}_E(\mathbb{F}_E) \mathbb{F}_A^{-T}$
+  \item[$\blacksquare$] It ``fixes'' the stresses (a pull-back) via
+    $\mathbb{P} = \det(\mathbb{F}_A) \mathbb{P}_E(\mathbb{F}_E) \mathbb{F}_A^{-T}$
+  \item[$\blacksquare$] This doesn't effect the penalties at all (nice tensor calculus exercise)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Saving Output}
+  This could be improved, especially on the EP side.
+  \begin{itemize}
+    \item[$\blacksquare$] Goal: no more munging log files, unknown units (use CGS)
+    \item[$\blacksquare$] \texttt{fsi::StatisticalOutput} collects all flow rate, pressure data,
+      etc. which is an average or point evaluation
+    \item[$\blacksquare$] Writes HDF5, in restart database
+    \item[$\blacksquare$] Same for the ParaView series file: no need to manually edit, the
+      correct version is always available after restarts
+  \end{itemize}
+
+  \vfill
+  We need better documentation on using VisIt, ParaView, managing session files,
+  scripting, etc. (some work is being done by Perry)
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plugins}
+  If you need a new stress function, just write it and add it with a callback in
+  \texttt{main()}.
+  \begin{itemize}
+    \item[$\blacksquare$] Same with circulation models, visualization, etc.
+    \item[$\blacksquare$] \texttt{main\_ep\_fsi3d} is essentially a bunch of callbacks on top of
+      the normal FSI stuff: source code is mostly plugins
+  \end{itemize}
+
+  \vfill
+  This isn't well documented, nor do we have great examples. Everything works but it
+  is difficult to use without asking me or Marshall about it.
+\end{frame}
+
+\section{Future Work}
+\begin{frame}
+  \frametitle{Improvement Area: Visualization}
+  What to do in Cardinal:
+  \begin{itemize}
+    \item[$\blacksquare$] PVTU isn't a great format for our purposes
+    \item[$\blacksquare$] We should write ExodusII or Nemesis (WIP)
+    \item[$\blacksquare$] The function for actually saving FE output is convoluted and should be split up
+  \end{itemize}
+  \vfill
+
+  Work to do in IBAMR:
+  \begin{itemize}
+    \item[$\blacksquare$] Stop saving duplicates of everything (PR 1785)
+    \item[$\blacksquare$] Document how ParaView and VisIt work for us
+    \item[$\blacksquare$] Script things
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Improvement Area: Electrophysiology}
+  What to do in Cardinal:
+  \begin{itemize}
+    \item[$\blacksquare$] Relatively under-documented: most classes don't document their
+      input database options
+    \item[$\blacksquare$] Some ionic models were copy-pasted from the Internet without attribution (bad!)
+    \item[$\blacksquare$] Migrate from PETSc to matrix-free stuff in deal.II (we support
+      non-embedded geometric multigrid these days)
+    \item[$\blacksquare$] Reduce entropy: use \texttt{LinearAlgebra::distributed::Vector} everywhere,
+      consistent style for options, no Greek letters, etc.
+    \item[$\blacksquare$] Make dealing with milliseconds vs seconds less painful
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Improvement Area: Tutorials}
+  What to do in Cardinal:
+  \begin{itemize}
+    \item[$\blacksquare$] A lot of the FCHEP examples don't work
+    \item[$\blacksquare$] Related: finish merging FCHEP and Cardinal
+    \item[$\blacksquare$] Limited examples for plugins
+    \item[$\blacksquare$] Should delete IBAMR-style examples which implement the main loops
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Improvement Area: Features}
+  What to do in Cardinal:
+  \begin{itemize}
+    \item[$\blacksquare$] Specify meshes with IBAMR's syntax, not one giant string
+    \item[$\blacksquare$] Replace chordae with springs (refactor the MitraClip code)
+    \item[$\blacksquare$] Fix broken ionic models
+    \item[$\blacksquare$] Better support for the hacks Laryssa and I used with NashPanfilov
+  \end{itemize}
+  \begin{lstlisting}
+electromechanics_function = "1 / viscosity * (voltage_coefficient * X_0 + 2/(1+X_2)^3 - 2)"
+  \end{lstlisting}
+  \vfill
+
+  Work to do in IBAMR:
+  \begin{itemize}
+    \item[$\blacksquare$] Implicit IB
+    \item[$\blacksquare$] Further reduce communication volume (there's a lot)
+    \item[$\blacksquare$] Better defaults for INS solvers in databases (better
+      for testing and reproducibility)
+  \end{itemize}
+\end{frame}
+
+
+\end{document}
